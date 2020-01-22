@@ -1,0 +1,21 @@
+{
+  "name": "Contents-Downloader Extension",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "description": "Chrome extension for Contents-Downloader",
+  "content_scripts": [{
+    "matches": ["https://*.sample.com/*"],
+    "js": [
+      "js/content.js"
+    ]
+  }],
+  "background": {
+    "scripts": [
+      "js/background.js"
+    ]
+  },
+  "permissions": [
+    "contextMenus",
+    "http://locahost:3000/"
+  ]
+}
