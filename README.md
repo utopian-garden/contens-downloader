@@ -12,6 +12,6 @@ Contents Download System with DynamoDB and ElasticMQ (For my study)
  Even if you run multiple Downloaders, requests are processed sequentially because of the benefits of MQ.
 
 [Environment]
- Node.js
- DynamoDB
- ElasticMQ
+ Node.js (12.14.0)
+ DynamoDB Local (1.11.477)
+ ElasticMQ (0.7.1)
