@@ -1,0 +1,51 @@
+{
+  "fs": {
+    "dlDir": "./downloads",
+    "histDir": "./downloads/_history",
+    "toolDir": "./_tools",
+    "orderFile":"Order.bat",
+    "listFile":"List.txt"
+  },
+  "api": {
+    "addItemUri": "/addItem",
+    "exceptionMsg": "Invalid Request"
+  },
+  "req": {
+    "common" : {
+      "userAgent" : "userAgent"
+    },
+    "auth" : {
+      "username" : "user",
+      "password" : "pass",
+      "authUrl": "https://api.sample.com/auth/token?lang=japanese",
+      "authPrefix": "Bearer "  
+    },
+    "search" : {
+      "searchUrl" : "https://api.sample.com/posts?tags=",
+      "searchParam" : "+-rating:safe&limit=100&page="
+    },
+    "fav" : {
+      "favUrl" : "https://api.sample.com/posts/",
+      "favParam" : "/favorite?language=japanese"
+    },
+    "vote" : {
+      "voteUrl": "https://api.sample.com/posts/",
+      "voteParam": "/vote?language=japanese"
+    },
+    "dl" : {
+      "referrerUrl": "https://www.sample.com/ja/post/show/"
+    }
+  },
+  "ddb": {
+    "tagTable": "Tag",
+    "favTable": "Fav",
+    "tagAttr": "tag",
+    "lastAttr": "last"
+  },
+  "sqs": {
+    "tagQueueUrl": "http://localhost:9324/queue/Tag",
+    "priorTagQueueUrl": "http://localhost:9324/queue/priorTag",
+    "favQueueUrl": "http://localhost:9324/queue/Fav",
+    "priorFavQueueUrl": "http://localhost:9324/queue/priorFav"
+  }
+}

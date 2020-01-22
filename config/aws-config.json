@@ -1,0 +1,6 @@
+{
+  "accessKeyId" : "user",
+  "secretAccessKey" : "pass",
+  "region" : "local",
+  "endpoint" : "http://localhost:8000"
+}
