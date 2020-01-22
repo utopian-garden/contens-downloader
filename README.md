@@ -9,7 +9,7 @@ Contents Download System with DynamoDB and ElasticMQ (For my study)
  Downloader gets the keyword from MQ again, and searches on the contents site.
  Downloader downloads search result contents. (When the content is not duplicated)
 
- Even if you run multiple Downloaders, requests are processed sequentially because of the benefits of MQ.
+ Even if Downloader run multiply, requests are processed sequentially because of the benefits of MQ.
 
 [Environment]
  Node.js (12.14.0)
