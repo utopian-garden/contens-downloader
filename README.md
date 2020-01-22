@@ -1,5 +1,5 @@
 # contens-downloader
-Contents Download System with DynamoDB and ElasticMQ (For my study)
+Contents Download System with Node.js, DynamoDB and ElasticMQ (For my study)
 
 [Description]
  The API server receives the keyword request from the Chrome extension.
