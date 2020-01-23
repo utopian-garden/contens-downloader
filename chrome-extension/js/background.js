@@ -3,14 +3,12 @@ chrome.contextMenus.create({
   contexts: ["link"],
   type: "normal",
   onclick: function (info) {
-    let xhr = new XMLHttpRequest();
-    let url = 'http://localhost:3000/addItem';
+    const xhr = new XMLHttpRequest();
+    const url = 'http://localhost:3000/addItem';
     xhr.open("POST", url);
     xhr.setRequestHeader("Content-Type", "application/json");
-    tags = info.linkUrl.split('=');
-    params = tags[1].split('+');
-    text = decodeURI(params[0]);
-    xhr.send(JSON.stringify({'table':'Tag', 'tag':text}));
+    tag = decodeURI(info.linkUrl.split('=').pop().split('+').shift());
+    xhr.send(JSON.stringify({'table':'Tag', 'tag':tag}));
   }
 });
 
@@ -19,13 +17,11 @@ chrome.contextMenus.create({
   contexts: ["link"],
   type: "normal",
   onclick: function (info) {
-    let xhr = new XMLHttpRequest();
-    let url = 'http://localhost:3000/addItem';
+    const xhr = new XMLHttpRequest();
+    const url = 'http://localhost:3000/addItem';
     xhr.open("POST", url);
     xhr.setRequestHeader("Content-Type", "application/json");
-    tags = info.linkUrl.split('=');
-    params = tags[1].split('+');
-    text = decodeURI(params[0]);
-    xhr.send(JSON.stringify({'table':'Fav', 'tag':text}));
+    tag = decodeURI(info.linkUrl.split('=').pop().split('+').shift());
+    xhr.send(JSON.stringify({'table':'Fav', 'tag':tag}));
   }
 });
