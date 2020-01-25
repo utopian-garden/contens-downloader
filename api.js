@@ -4,11 +4,11 @@ const http = require('http');
 var url = require('url');
 const ddb = require('./lib/ddb.js');
 const sqs = require('./lib/sqs.js');
-const config = require('./config/app-config.json');
+const appConfig = require('./config/app-config.json');
 
 const server = http.createServer(async (req, res) => {
-  const uri = url.parse(req.url).pathname;
-  const addItemUri = config.api.addItemUri;
+  const reqUri = url.parse(req.url).pathname;
+  const addItemUri = appConfig.api.addItemUri;
 
   if (req.method === 'OPTIONS') {
     // Chrome の CORS 回避
@@ -18,32 +18,32 @@ const server = http.createServer(async (req, res) => {
       'Access-Control-Allow-Headers':'content-type'
     });
     res.end();
-  } else if (req.method === 'POST' && uri === addItemUri) {
+  } else if (req.method === 'POST' && reqUri === addItemUri) {
     let body = '';
     req.on('data', data => {
       body += data;
     });
     req.on('end', async () => {
-      const reqJson = JSON.parse(body);
-      const reqTable = reqJson.table;
-      const reqTag = reqJson.tag;
+      const reqBody = JSON.parse(body);
+      const reqTable = reqBody.table;
+      const reqTag = reqBody.tag;
 
       // レスポンスヘッダ
       res.writeHead(200, {'Content-Type': 'application/json;charset=utf-8'});
 
       // DB更新
       const ddbUpdate = async (reqTable, reqTag) => {
-        const updateParams = {
+        const updParams = {
           TableName: reqTable,
           Key: {
             'tag': reqTag
           }
         };
-        await ddb.updateItem(updateParams)
+        await ddb.updateItem(updParams)
           .then(() => {
             // レスポンスボディ
             res.write(JSON.stringify({'success': true, 'table': reqTable, 'tag': reqTag}));
-            console.log(updateParams);
+            console.log(updParams);
           })
           .catch(err => {
             // エラー時のレスポンスボディ
@@ -53,10 +53,10 @@ const server = http.createServer(async (req, res) => {
       }
 
       // 入力チェックして実行
-      const tagTable = config.ddb.tagTable;
-      const favTable = config.ddb.favTable;
+      const dlTable = appConfig.ddb.dlTable;
+      const favTable = appConfig.ddb.favTable;
       switch (reqTable) {
-        case tagTable:
+        case dlTable:
         case favTable:
           await ddbUpdate(reqTable, reqTag);
         default:
@@ -81,13 +81,13 @@ const server = http.createServer(async (req, res) => {
 
       // 入力チェックして実行
       switch (reqTable) {
-        case tagTable:
-          const priorTagQueueUrl = config.sqs.priorTagQueueUrl;
-          await sendMessage(priorTagQueueUrl, reqTag);
+        case dlTable:
+          const priorDlQueUrl = appConfig.sqs.priorDlQueUrl;
+          await sendMessage(priorDlQueUrl, reqTag);
           break;
         case favTable:
-          const priorFavQueueUrl = config.sqs.priorFavQueueUrl;
-          await sendMessage(priorFavQueueUrl, reqTag);
+          const priorFavQueUrl = appConfig.sqs.priorFavQueUrl;
+          await sendMessage(priorFavQueUrl, reqTag);
           break;
         default:
           break;
@@ -97,9 +97,9 @@ const server = http.createServer(async (req, res) => {
     });
   } else {
     // リクエストの例外処理
-    const exceptionMsg = config.api.exceptionMsg;
+    const exceptMsg = appConfig.api.exceptMsg;
     res.writeHead(400, {'Content-Type': 'application/json;charset=utf-8'});
-    res.write(JSON.stringify({'success': false, 'status': exceptionMsg}));
+    res.write(JSON.stringify({'success': false, 'status': exceptMsg}));
     res.end();
   }
 });

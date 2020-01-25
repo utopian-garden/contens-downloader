@@ -8,7 +8,7 @@ const req = require('./lib/req.js');
 const ddb = require('./lib/ddb.js');
 const sqs = require('./lib/sqs.js');
 const walk = require('./lib/walk.js');
-const config = require('./config/app-config.json');
+const appConfig = require('./config/app-config.json');
 
 exports.dlPosts = async () => {
   // log4js のイニシャライズ
@@ -17,28 +17,39 @@ exports.dlPosts = async () => {
   // ループ処理開始
   while (true) {
     // 優先キューからメッセージを取得
-    const priorTagQueueUrl = config.sqs.priorTagQueueUrl;
+    const priorDlQueUrl = appConfig.sqs.priorDlQueUrl;
     const recvParams = {
-      QueueUrl: priorTagQueueUrl,
+      QueueUrl: priorDlQueUrl,
     };
-    let message = await sqs.recvMsg(recvParams);
+
+    let tagMsg;
+    try {
+      tagMsg = await sqs.recvMsg(recvParams);
+    } catch(err) {
+      console.log(err);
+    }
 
     // 通常キューからメッセージを取得
-    const tagQueueUrl = config.sqs.tagQueueUrl;
-    if (message === undefined) {
+    const dlQueUrl = appConfig.sqs.dlQueUrl;
+    if (tagMsg === undefined) {
       const recvParams = {
-        QueueUrl: tagQueueUrl,
+        QueueUrl: dlQueUrl,
       };
-      message = await sqs.recvMsg(recvParams);
+
+      try {
+        tagMsg = await sqs.recvMsg(recvParams);
+      } catch(err) {
+        console.log(err);
+      }
     }
   
-    const tagTable = config.ddb.tagTable;
-    if (message === undefined) {
+    const dlTable = appConfig.ddb.dlTable;
+    if (tagMsg === undefined) {
       // 取得できなかった場合は通常キューにメッセージを補充
 
       // DBスキャン
       const searchParams = {
-        TableName: tagTable,
+        TableName: dlTable,
       };
 
       let tagItems = [];
@@ -53,7 +64,7 @@ exports.dlPosts = async () => {
         const item = JSON.stringify(items);
         const sendParams = {
           MessageBody: item,
-          QueueUrl: tagQueueUrl,
+          QueueUrl: dlQueUrl,
           DelaySeconds: 0,
         };
         sqs.sendMsg(sendParams);
@@ -68,24 +79,24 @@ exports.dlPosts = async () => {
       }
 
       // 最終更新の取得
-      const tag = message.tag;
-      let last = message.last;
-      if (last === undefined) {
-        last = 0;
+      const tagKey = tagMsg.tag;
+      let curLast = tagMsg.last;
+      if (curLast === undefined) {
+        curLast = 0;
       }
 
-      let page = 1;
+      let pageNum = 1;
       let newLast = 0;
 
       // ページでループ
       page_loop:
       while (true) {
-        console.log(tag, page);
+        console.log(tagKey, pageNum);
 
         // 検索リクエスト
-        let jsonSearch;
+        let searchRes;
         try {
-          jsonSearch = await req.searchPost(tag, page, authToken);
+          searchRes = await req.searchPost(tagKey, pageNum, authToken);
         } catch(err) {
           console.log(err.message);
           continue;
@@ -93,67 +104,65 @@ exports.dlPosts = async () => {
 
         let promiseArray = [];
 
-        if (jsonSearch !== undefined) {
-          if (jsonSearch.length === 0) {
-            if (page === 1) {
-              logger.debug(tag, encodeURI(tag));
+        if (searchRes !== undefined) {
+          if (searchRes.length === 0) {
+            if (pageNum === 1) {
+              logger.debug(tagKey, encodeURI(tagKey));
             }
 
             break;
           }
 
-          if (page === 1) {
+          if (pageNum === 1) {
             // 最新Post番号の取得
-            newLast = jsonSearch[0].id;
+            newLast = searchRes[0].id;
           }
 
           // 検索結果でループ
-          for (let i = 0; i < jsonSearch.length; i++) {
-            const post_id = jsonSearch[i].id;
-            if (last > post_id) {
+          for (let i = 0; i < searchRes.length; i++) {
+            const postId = searchRes[i].id;
+            if (curLast > postId) {
               break page_loop;
             }
 
             // ファイル名の整形
-            const file_url = jsonSearch[i].file_url;
-            const extension = file_url.split('/').pop().split('?').shift()
+            const fileUrl = searchRes[i].file_url;
+            const extension = fileUrl.split('/').pop().split('?').shift()
                 .split('.').pop();
-            const file_name = post_id + '.' + extension;
-            const tag_dir = path.join(config.fs.dlDir, tag);
-            const hist_dir = path.join(config.fs.histDir, tag);
-            const file_path = path.join(tag_dir, file_name);
+            const fileName = postId + '.' + extension;
+            const tagDir = path.join(appConfig.fs.dlDir, tagKey);
+            const histDir = path.join(appConfig.fs.histDir, tagKey);
+            const filePath = path.join(tagDir, fileName);
 
             // ファイルの存在チェック
-            if (!await walk.walkExistsSync(tag_dir, file_name) &&
-                !await walk.walkExistsSync(hist_dir, file_name)) {
+            if (!await walk.walkExistsSync(tagDir, fileName) &&
+                !await walk.walkExistsSync(histDir, fileName)) {
 
               // ディレクトリの作成
-              fs.ensureDirSync(tag_dir);
+              fs.ensureDirSync(tagDir);
 
               // テンプレートファイルの配布
-              const toolDir = config.fs.toolDir;
-              const orderFile = config.fs.orderFile;
-              const listFile = config.fs.listFile;
-              const order_from = path.join(toolDir, orderFile);
-              const order_to = path.join(tag_dir, orderFile);
-              const list_from = path.join(toolDir, listFile);
-              const list_to = path.join(tag_dir, listFile);
+              const toolDir = appConfig.fs.toolDir;
+              const orderFile = appConfig.fs.orderFile;
+              const listFile = appConfig.fs.listFile;
+              const orderFrom = path.join(toolDir, orderFile);
+              const orderTo = path.join(tagDir, orderFile);
+              const listFrom = path.join(toolDir, listFile);
+              const listTo = path.join(tagDir, listFile);
 
-              if (!fs.pathExistsSync(order_to)) {
-                fs.copySync(order_from, order_to);
+              if (!fs.pathExistsSync(orderTo)) {
+                fs.copySync(orderFrom, orderTo);
               }
 
-              if (!fs.pathExistsSync(list_to)) {
-                fs.copySync(list_from, list_to);
+              if (!fs.pathExistsSync(listTo)) {
+                fs.copySync(listFrom, listTo);
               }
 
               // ダウンロード リクエスト
-              const referrerUrl = config.req.dl.referrerUrl;
-              const referrer = referrerUrl + post_id;
-              
+              const refererUrl = appConfig.req.dl.refererUrl + postId;              
               try {
-                await req.dlContent(file_path, file_url, referrer);
-                console.log(post_id);
+                await req.dlContent(filePath, fileUrl, refererUrl);
+                console.log(postId);
               } catch(err) {
                 switch(err.statusCode) {
                   case 404:
@@ -166,25 +175,35 @@ exports.dlPosts = async () => {
             }
 
             // お気に入りリクエスト
-            const is_favorited = jsonSearch[i].is_favorited;
-            if (!is_favorited) {
-              promiseArray.push(req.favPost(post_id, authToken));
+            const isFaved = searchRes[i].is_favorited;
+            if (!isFaved) {
+              //promiseArray.push(req.favPost(postId, authToken));
+              try {
+                await req.favPost(postId, authToken);
+              } catch(err) {
+                console.log(err);
+              }
             }
 
             // 投票リクエスト
-            let user_vote = jsonSearch[i].user_vote;
-            if (user_vote === undefined) {
-              user_vote = 0;
+            let userVote = searchRes[i].user_vote;
+            if (userVote === undefined) {
+              userVote = 0;
             }
-            if (user_vote > 0) {
-              promiseArray.push(req.votePost(post_id, authToken));
+            if (userVote > 0) {
+              //promiseArray.push(req.votePost(postId, authToken));
+              try {
+                await req.votePost(postId, authToken);
+              } catch(err) {
+                console.log(err);
+              }
             }
           }
         }
 
         await Promise.all(promiseArray)
           .then(() => {
-            page++;
+            pageNum++;
           })
           .catch((err) => {
             console.log(err);
@@ -192,12 +211,12 @@ exports.dlPosts = async () => {
       }
 
       // 最新Postを更新
-      if (newLast > last) {
-        const lastAttr = config.ddb.lastAttr;
-        const updateParams = {
-          TableName: tagTable,
+      if (newLast > curLast) {
+        const lastAttr = appConfig.ddb.lastAttr;
+        const updParams = {
+          TableName: dlTable,
           Key: {
-            'tag': tag
+            'tag': tagKey
           },
           ExpressionAttributeNames: {
             '#l': lastAttr
@@ -209,7 +228,7 @@ exports.dlPosts = async () => {
         };
       
         try {
-          await ddb.updateItem(updateParams);
+          await ddb.updateItem(updParams);
         } catch(err) {
           console.log(JSON.stringify(err));
         }
@@ -218,7 +237,7 @@ exports.dlPosts = async () => {
   }
 }
 
-const concurrency = 1;
+const concurrency = 4;
 
 for (let i = 0; i < concurrency; i++) {
   exports.dlPosts();

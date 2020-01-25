@@ -5,33 +5,42 @@ log4js.configure('./config/fav-log-config.json');
 const req = require('./lib/req.js');
 const ddb = require('./lib/ddb.js');
 const sqs = require('./lib/sqs.js');
-const config = require('./config/app-config.json');
+const appConfig = require('./config/app-config.json');
 
 // 無名非同期関数によるメイン処理
 exports.favPosts = async () => {
-  // log4js のイニシャライズ
   const logger = log4js.getLogger('system');
 
   // ループ処理開始
   while (true) {
     // 優先メッセージ取得
-    const priorFavQueueUrl = config.sqs.priorFavQueueUrl;
-    const receiveParams = {
-      QueueUrl: priorFavQueueUrl,
+    const priorFavQueUrl = appConfig.sqs.priorFavQueUrl;
+    const recvParams = {
+      QueueUrl: priorFavQueUrl,
     };
-    let message = await sqs.recvMsg(receiveParams);
+
+    let tagMsg;
+    try {
+      tagMsg = await sqs.recvMsg(recvParams);
+    } catch(err) {
+      console.log(err);
+    }
 
     // メッセージ取得
-    const favQueueUrl = config.sqs.favQueueUrl;
-    if (message === undefined) {
-      const receiveParams = {
-        QueueUrl: favQueueUrl,
+    const favQueUrl = appConfig.sqs.favQueUrl;
+    if (tagMsg === undefined) {
+      const recvParams = {
+        QueueUrl: favQueUrl,
       };
-      message = await sqs.recvMsg(receiveParams);
+      try {
+        tagMsg = await sqs.recvMsg(recvParams);
+      } catch(err) {
+        console.log(err);
+      }
     }
   
-    const favTable = config.ddb.favTable;
-    if (message === undefined) {
+    const favTable = appConfig.ddb.favTable;
+    if (tagMsg === undefined) {
       // 取得できなかった場合はメッセージを補充
 
       // DBスキャン
@@ -47,11 +56,11 @@ exports.favPosts = async () => {
       }
   
       // メッセージ送信
-      for (let items of favItems) {
-        const item = JSON.stringify(items);
+      for (let item of favItems) {
+        const msgItem = JSON.stringify(item);
         const sendParams = {
-          MessageBody: item,
-          QueueUrl: favQueueUrl,
+          MessageBody: msgItem,
+          QueueUrl: favQueUrl,
           DelaySeconds: 0,
         };
         sqs.sendMsg(sendParams);
@@ -66,72 +75,82 @@ exports.favPosts = async () => {
       }
 
       // 最終更新の取得
-      const tag = message.tag;
-      let last = message.last;
-      if (last === undefined) {
-        last = 0;
+      const tagKey = tagMsg.tag;
+      let curLast = tagMsg.last;
+      if (curLast === undefined) {
+        curLast = 0;
       }
 
-      let page = 1;
+      let pageNum = 1;
       let newLast = 0;
 
       // ページでループ
       page_loop:
       while (true) {
-        console.log(tag, page);
+        console.log(tagKey, pageNum);
 
         // 検索リクエスト
-        let jsonSearch;
+        let searchRes;
         try {
-          jsonSearch = await req.searchPost(tag, page, authToken);
+          searchRes = await req.searchPost(tagKey, pageNum, authToken);
         } catch(err) {
           console.log(err.message);
-          continue page_loop;
+          continue;
         }
         
         let promiseArray = [];
 
-        if (jsonSearch !== undefined) {
-          if (jsonSearch.length === 0) {
-            if (page === 1) {
-              logger.debug(tag, encodeURI(tag));
+        if (searchRes !== undefined) {
+          if (searchRes.length === 0) {
+            if (pageNum === 1) {
+              logger.debug(tagKey, encodeURI(tagKey));
             }
             
             break;
           }
 
-          if (page === 1) {
+          if (pageNum === 1) {
             // 最新Post番号の取得
-            newLast = jsonSearch[0].id;
+            newLast = searchRes[0].id;
           }
 
           // 検索結果でループ
-          for (let i = 0; i < jsonSearch.length; i++) {
-            const post_id = jsonSearch[i].id;
-            if (last > post_id) {
+          for (let i = 0; i < searchRes.length; i++) {
+            const postId = searchRes[i].id;
+            if (curLast > postId) {
               break page_loop;
             }
 
             // お気に入りリクエスト
-            const is_favorited = jsonSearch[i].is_favorited;
-            if (!is_favorited) {
-              promiseArray.push(req.favPost(post_id, authToken));
+            const isFaved = searchRes[i].is_favorited;
+            if (!isFaved) {
+              //promiseArray.push(req.favPost(postId, authToken));
+              try {
+                await req.favPost(postId, authToken);
+              } catch(err) {
+                console.log(err);
+              }
             }
             
             // 投票リクエスト
-            let user_vote = jsonSearch[i].user_vote;
-            if (user_vote === undefined) {
-              user_vote = 0;
+            let userVote = searchRes[i].user_vote;
+            if (userVote === undefined) {
+              userVote = 0;
             }
-            if (user_vote > 0) {
-              promiseArray.push(req.votePost(post_id, authToken));
+            if (userVote > 0) {
+              //promiseArray.push(req.votePost(postId, authToken));
+              try {
+                await req.votePost(postId, authToken);
+              } catch(err) {
+                console.log(err);
+              }
             }
           }
         }
         
         await Promise.all(promiseArray)
           .then(() => {
-            page++;
+            pageNum++;
           })
           .catch((err) => {
             console.log(err);
@@ -139,12 +158,12 @@ exports.favPosts = async () => {
       }
 
       // 最新Postを更新
-      if (newLast > last) {
-        const lastAttr = config.ddb.lastAttr;
-        const updateParams = {
+      if (newLast > curLast) {
+        const lastAttr = appConfig.ddb.lastAttr;
+        const updParams = {
           TableName: favTable,
           Key: {
-            'tag': tag
+            'tag': tagKey
           },
           ExpressionAttributeNames: {
             '#l': lastAttr
@@ -156,7 +175,7 @@ exports.favPosts = async () => {
         };
 
         try {
-          await ddb.updateItem(updateParams);
+          await ddb.updateItem(updParams);
         } catch(err) {
           console.log(JSON.stringify(err));
         }
@@ -165,8 +184,8 @@ exports.favPosts = async () => {
   }
 }
 
-const concurrency = 1;
+const paraDeg = 2;
 
-for (let i = 0; i < concurrency; i++) {
+for (let i = 0; i < paraDeg; i++) {
   exports.favPosts();
 }
