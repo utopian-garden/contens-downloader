@@ -1,6 +1,6 @@
 window.onload = () => {
   // お気に入り済みコンテンツのグレーアウト
-  document.querySelectorAll('[class*="favorited"]').forEach((img) => {
+  document.querySelectorAll('[class*="favorited"], [class*=attachment-thumbnail]').forEach((img) => {
     img.style.display = 'none';
   });
 
@@ -36,6 +36,6 @@ const config = {
   characterData: true
 };
 
-if (elem !== undefined) {
+if (elem !== undefined && elem) {
   observer.observe(elem, config);
 }

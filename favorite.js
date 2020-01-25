@@ -11,6 +11,14 @@ const appConfig = require('./config/app-config.json');
 exports.favPosts = async () => {
   const logger = log4js.getLogger('system');
 
+  // 認証リクエスト
+  let authToken;
+  try {
+    authToken = await req.getToken();
+  } catch(err) {
+    console.log(err.message);
+  }
+
   // ループ処理開始
   while (true) {
     // 優先メッセージ取得
@@ -66,14 +74,6 @@ exports.favPosts = async () => {
         sqs.sendMsg(sendParams);
       }
     } else {
-      // 認証リクエスト
-      let authToken;
-      try {
-        authToken = await req.getToken();
-      } catch(err) {
-        console.log(err.message);
-      }
-
       // 最終更新の取得
       const tagKey = tagMsg.tag;
       let curLast = tagMsg.last;

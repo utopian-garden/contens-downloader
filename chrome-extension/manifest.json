@@ -2,7 +2,7 @@
   "name": "Contents-Downloader Extension",
   "version": "1.0.0",
   "manifest_version": 2,
-  "description": "Chrome extension for Contents-Downloader",
+  "description": "Chrome Extension for Contents-Downloader",
   "content_scripts": [{
     "matches": ["https://*.sample.com/*"],
     "js": [
@@ -17,5 +17,17 @@
   "permissions": [
     "contextMenus",
     "http://locahost:3000/"
-  ]
+  ],
+  "icons": {
+    "16": "images/16.png",
+    "48": "images/48.png",
+    "128": "images/128.png"
+  },
+  "web_accessible_resources": [
+    "popup.html"
+  ],
+  "browser_action": {
+    "default_title": "popup",
+    "default_popup": "popup.html"
+  }
 }
