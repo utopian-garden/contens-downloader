@@ -27,59 +27,20 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       const reqBody = JSON.parse(body);
       const addItemUri = appConfig.api.addItemUri;
-      const shiftItemUri = appConfig.api.shiftItemUri;
       const dlTable = appConfig.ddb.dlTable;
       const favTable = appConfig.ddb.favTable;
       const reqTag = reqBody.tag;
       const reqTable = reqBody.table;
 
       switch (reqUri) {
-        // アイテムの追加処理
+        // アイテムの追加/削除処理
         case addItemUri:
-          // 入力チェックしてDB更新
+          // 入力チェック
+          let oppTable;
+
           switch (reqTable) {
-            case dlTable:
             case favTable:
-              try {
-                await ddbUpdate(reqTable, reqTag);
-                // レスポンス
-                res.writeHead(200, {'Content-Type': 'application/json;charset=utf-8'});
-                res.write(JSON.stringify({'success': true, 'table': reqTable, 'tag': reqTag}));
-              } catch(err) {
-                // エラー時のレスポンス
-                res.writeHead(503, {'Content-Type': 'application/json;charset=utf-8'});
-                res.write(JSON.stringify({'success': false, 'table': reqTable, 'tag': reqTag}));
-              }
-
-            default:
-              break;
-          }
-
-          // 入力チェックしてMQ送信
-          switch (reqTable) {
-            case dlTable:
-              const priorDlQueUrl = appConfig.sqs.priorDlQueUrl;
-              await sendMessage(priorDlQueUrl, reqTag);
-              break;
-            case favTable:
-              const priorFavQueUrl = appConfig.sqs.priorFavQueUrl;
-              await sendMessage(priorFavQueUrl, reqTag);
-              break;
-            default:
-              break;
-          }
-
-          break;
-
-        // アイテムの移動処理
-        case shiftItemUri:
-          const reqFrom = reqBody.from;
-          const reqTo = reqBody.to;
-
-          // 入力チェックしてDB更新
-          switch (reqTo) {
-            case favTable:
-              // DL から FAV に移る場合はDLフォルダを削除
+              // Favorite に登録する場合は既存のDLフォルダを削除
               const dlDir = appConfig.fs.dlDir;
               try {
                 fs.removeSync(path.join(dlDir, reqTag));
@@ -87,36 +48,48 @@ const server = http.createServer(async (req, res) => {
                 console.log(err);
               }
 
-            case dlTable:
-              await ddbUpdate(reqTo, reqTag);
-              // レスポンス
-              res.writeHead(200, {'Content-Type': 'application/json;charset=utf-8'});
-              res.write(JSON.stringify({'success': true, 'table': reqTable, 'tag': reqTag}));
-            default:
-              break;
-          }
-
-          // 入力チェックしてDB削除
-          switch (reqFrom) {
-            case dlTable:
-            case favTable:
+              // DBの更新/削除
+              oppTable = dlTable;
               try {
-                await ddbDelete(reqFrom, reqTag);
-                // レスポンス
+                await ddbUpdate(reqTable, reqTag);
+                await ddbDelete(oppTable, reqTag);
                 res.writeHead(200, {'Content-Type': 'application/json;charset=utf-8'});
                 res.write(JSON.stringify({'success': true, 'table': reqTable, 'tag': reqTag}));
               } catch(err) {
-                // エラー時のレスポンスヘッダ
                 res.writeHead(503, {'Content-Type': 'application/json;charset=utf-8'});
                 res.write(JSON.stringify({'success': false, 'table': reqTable, 'tag': reqTag}));
               }
 
+              // MQのリクエストキューに送信
+              const priorFavQueUrl = appConfig.sqs.priorFavQueUrl;
+              await sendMessage(priorFavQueUrl, reqTag);
+
+              break;
+
+            case dlTable:
+              // DBの更新/削除
+              oppTable = favTable;
+              try {
+                await ddbUpdate(reqTable, reqTag);
+                await ddbDelete(oppTable, reqTag);
+                res.writeHead(200, {'Content-Type': 'application/json;charset=utf-8'});
+                res.write(JSON.stringify({'success': true, 'table': reqTable, 'tag': reqTag}));
+
+              } catch(err) {
+                res.writeHead(503, {'Content-Type': 'application/json;charset=utf-8'});
+                res.write(JSON.stringify({'success': false, 'table': reqTable, 'tag': reqTag}));
+              }
+
+              // MQのリクエストキューに送信
+              const priorDlQueUrl = appConfig.sqs.priorDlQueUrl;
+              await sendMessage(priorDlQueUrl, reqTag);
+
+              break;
+
             default:
               break;
           }
 
-          break;
-        default:
           break;
       }
 
@@ -160,7 +133,7 @@ const ddbDelete = async (reqTable, reqTag) => {
 
   try {
     await ddb.deleteItem(delParams);
-    console.log('delete', delParams);
+    console.log('delete:', delParams);
   } catch(err) {
     console.log(JSON.stringify(err));
     throw err;

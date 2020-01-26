@@ -184,7 +184,7 @@ exports.favPosts = async () => {
   }
 }
 
-const paraDeg = 2;
+const paraDeg = 1;
 
 for (let i = 0; i < paraDeg; i++) {
   exports.favPosts();

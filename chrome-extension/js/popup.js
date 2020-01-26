@@ -1,29 +1,21 @@
 // test
-const shiftRequest = (buttonId) => {
-  let inputTag = document.getElementById('tag');
-  let fromTab, toTab;
-  if (buttonId === 'favorite') {
-    fromTab = 'Download';
-    toTab = 'Favorite';
-  } else {
-    fromTab = 'Favorite';
-    toTab = 'Download';
-  }
+const addRequest = (addTab) => {
+  let inputKey = document.getElementById('tag');
 
   const xhr = new XMLHttpRequest();
-  xhr.open("POST", 'http://localhost:3000/shiftItem');
+  xhr.open("POST", 'http://localhost:3000/addItem');
   xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.send(JSON.stringify({'tag':inputTag.value, 'from':fromTab, 'to':toTab}));
+  xhr.send(JSON.stringify({'table':addTab, 'tag':inputKey.value}));
 
-  inputTag.value = "";
+  inputKey.value = "";
 }
 
 // test
 document.getElementById('download').addEventListener('click', () => {
-  shiftRequest('download');
+  addRequest('Download');
 }, false);
 
 // test
 document.getElementById('favorite').addEventListener('click', () => {
-  shiftRequest('favorite');
+  addRequest('Favorite');
 }, false);

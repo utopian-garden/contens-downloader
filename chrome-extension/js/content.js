@@ -1,15 +1,16 @@
 window.onload = () => {
   // お気に入り済みコンテンツのグレーアウト
-  document.querySelectorAll('[class*="favorited"], [class*=attachment-thumbnail]').forEach((img) => {
-    img.style.display = 'none';
-  });
+  document.querySelectorAll('[class*="favorited"], [class*=attachment-thumbnail]')
+    .forEach((img) => {
+      img.style.display = 'none';
+    });
 
   // 検索のオプションを追加、一部の文字サイズを変更
-  const tag = document.querySelectorAll('[class="tag-type-artist"] > a, [class="tag-type-studio"] > a');
-  tag.forEach((link) => {
-    link.style.fontSize = '120%';
-    link.setAttribute('href', link.getAttribute('href') + '+order:quality+-rating:safe');
-  });
+  document.querySelectorAll('[class="tag-type-artist"] > a, [class="tag-type-studio"] > a')
+    .forEach((link) => {
+      link.style.fontSize = '120%';
+      link.setAttribute('href', link.getAttribute('href') + '+order:quality+-rating:safe');
+    });
 
   // 検索のオプションを追加
   const options = ' order:quality -rating:safe';
