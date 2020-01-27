@@ -8,8 +8,14 @@ window.onload = () => {
   // お気に入り済みコンテンツのグレーアウト
   document.querySelectorAll('[class*="favorited"]')
     .forEach((img) => {
-      img.parentNode.href = 'javascript:disabledLink();void(0)';
       img.style.webkitFilter = "saturate(0%)";
+
+      const disabledLink = () => {
+        window.open(img.parentNode.link);
+      };
+      img.parentNode.link = img.parentNode.href;
+      img.parentNode.removeAttribute('href');
+      img.parentNode.addEventListener('click', disabledLink);
     });
 
   // 検索のオプションを追加、一部の文字サイズを変更
