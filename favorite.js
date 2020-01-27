@@ -103,7 +103,7 @@ exports.favPosts = async () => {
         if (searchRes !== undefined) {
           if (searchRes.length === 0) {
             if (pageNum === 1) {
-              logger.debug(tagKey, encodeURI(tagKey));
+              logger.debug(tagKey);
             }
             
             break;

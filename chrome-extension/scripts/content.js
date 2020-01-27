@@ -1,8 +1,15 @@
 window.onload = () => {
-  // お気に入り済みコンテンツのグレーアウト
-  document.querySelectorAll('[class*="favorited"], [class*=attachment-thumbnail]')
+  // 不要コンテンツの非表示
+  document.querySelectorAll('[class*=attachment-thumbnail]')
     .forEach((img) => {
-      img.style.display = 'none';
+      img.style.display = "none";
+    });
+
+  // お気に入り済みコンテンツのグレーアウト
+  document.querySelectorAll('[class*="favorited"]')
+    .forEach((img) => {
+      img.parentNode.href = 'javascript:disabledLink();void(0)';
+      img.style.webkitFilter = "saturate(0%)";
     });
 
   // 検索のオプションを追加、一部の文字サイズを変更
@@ -25,7 +32,8 @@ window.onload = () => {
 // DOM変化時の処理
 const observer = new MutationObserver(() => {
   document.querySelectorAll('[class*="favorited"]').forEach((img) => {
-    img.style.display = 'none';
+    img.parentNode.href = 'javascript:disabledLink();void(0)';
+    img.style.webkitFilter = "saturate(0%)";
   });
 });
 

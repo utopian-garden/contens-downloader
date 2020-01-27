@@ -4,7 +4,7 @@ const addRequest = (info, addTab) => {
   const url = 'http://localhost:3000/addItem';
   xhr.open("POST", url);
   xhr.setRequestHeader("Content-Type", "application/json");
-  const tagKey = decodeURI(info.linkUrl.split('=').pop().split('+').shift());
+  const tagKey = decodeURIComponent(info.linkUrl.split('=').pop().split('+').shift());
   xhr.send(JSON.stringify({'table':addTab, 'tag':tagKey}));
 }
 
