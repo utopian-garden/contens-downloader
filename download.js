@@ -77,8 +77,28 @@ exports.dlPosts = async () => {
         sqs.sendMsg(sendParams);
       }
     } else {
-      // 最終更新の取得
+      // DB整合性チェック
       const tagKey = tagMsg.tag;
+      const checkParams = {
+        TableName: dlTable,
+        ExpressionAttributeNames:{'#d': 'tag'},
+        ExpressionAttributeValues:{':val': tagKey},
+        KeyConditionExpression: '#d = :val'
+      };
+      let itemCheck;
+      try {
+        itemCheck = await ddb.queryItem(checkParams);
+      } catch(err) {
+        console.log(JSON.stringify(err));
+        continue;
+      } 
+
+      if (itemCheck.Items.length === 0) {
+        console.log('Skipped:' + tagKey);
+        continue;
+      }
+
+      // 最終更新の取得
       let curLast = tagMsg.last;
       if (curLast === undefined) {
         curLast = 0;
@@ -236,7 +256,7 @@ exports.dlPosts = async () => {
   }
 }
 
-const concurrency = 4;
+const concurrency = 1;
 
 for (let i = 0; i < concurrency; i++) {
   exports.dlPosts();

@@ -74,8 +74,28 @@ exports.favPosts = async () => {
         sqs.sendMsg(sendParams);
       }
     } else {
-      // 最終更新の取得
+      // DB整合性チェック
       const tagKey = tagMsg.tag;
+      const checkParams = {
+        TableName: favTable,
+        ExpressionAttributeNames:{'#f': 'tag'},
+        ExpressionAttributeValues:{':val': tagKey},
+        KeyConditionExpression: '#f = :val'
+      };
+      let itemCheck;
+      try {
+        itemCheck = await ddb.queryItem(checkParams);
+      } catch(err) {
+        console.log(JSON.stringify(err));
+        continue;
+      } 
+
+      if (itemCheck.Items.length === 0) {
+        console.log('Skipped:' + tagKey);
+        continue;
+      }
+
+      // 最終更新の取得
       let curLast = tagMsg.last;
       if (curLast === undefined) {
         curLast = 0;
@@ -127,20 +147,6 @@ exports.favPosts = async () => {
               //promiseArray.push(req.favPost(postId, authToken));
               try {
                 await req.favPost(postId, authToken);
-              } catch(err) {
-                console.log(err);
-              }
-            }
-            
-            // 投票リクエスト
-            let userVote = searchRes[i].user_vote;
-            if (userVote === undefined) {
-              userVote = 0;
-            }
-            if (userVote > 0) {
-              //promiseArray.push(req.votePost(postId, authToken));
-              try {
-                await req.votePost(postId, authToken);
               } catch(err) {
                 console.log(err);
               }

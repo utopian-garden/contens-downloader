@@ -11,9 +11,9 @@ window.onload = () => {
       img.style.webkitFilter = "saturate(0%)";
 
       const disabledLink = () => {
-        window.open(img.parentNode.link);
+        window.open(img.parentNode.linkUrl);
       };
-      img.parentNode.link = img.parentNode.href;
+      img.parentNode.linkUrl = img.parentNode.href;
       img.parentNode.removeAttribute('href');
       img.parentNode.addEventListener('click', disabledLink);
     });
