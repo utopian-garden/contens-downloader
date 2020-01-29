@@ -75,10 +75,11 @@ exports.favPosts = async () => {
       }
     } else {
       // DB整合性チェック
+      const tagAttr = appConfig.ddb.tagAttr;
       const tagKey = tagMsg.tag;
       const checkParams = {
         TableName: favTable,
-        ExpressionAttributeNames:{'#f': 'tag'},
+        ExpressionAttributeNames:{'#f': tagAttr},
         ExpressionAttributeValues:{':val': tagKey},
         KeyConditionExpression: '#f = :val'
       };

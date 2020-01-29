@@ -78,10 +78,11 @@ exports.dlPosts = async () => {
       }
     } else {
       // DB整合性チェック
+      const tagAttr = appConfig.ddb.tagAttr;
       const tagKey = tagMsg.tag;
       const checkParams = {
         TableName: dlTable,
-        ExpressionAttributeNames:{'#d': 'tag'},
+        ExpressionAttributeNames:{'#d': tagAttr},
         ExpressionAttributeValues:{':val': tagKey},
         KeyConditionExpression: '#d = :val'
       };

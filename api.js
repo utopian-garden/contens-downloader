@@ -53,11 +53,19 @@ const server = http.createServer(async (req, res) => {
               try {
                 await ddbUpdate(reqTable, reqTag);
                 await ddbDelete(oppTable, reqTag);
-                res.writeHead(200, {'Content-Type': 'application/json;charset=utf-8'});
-                res.write(JSON.stringify({'success': true, 'table': reqTable, 'tag': reqTag}));
+                res.writeHead(200, {
+                  'Content-Type': 'application/json;charset=utf-8'
+                });
+                res.write(JSON.stringify({
+                  'success': true, 'table': reqTable, 'tag': reqTag
+                }));
               } catch(err) {
-                res.writeHead(503, {'Content-Type': 'application/json;charset=utf-8'});
-                res.write(JSON.stringify({'success': false, 'table': reqTable, 'tag': reqTag}));
+                res.writeHead(503, {
+                  'Content-Type': 'application/json;charset=utf-8'
+                });
+                res.write(JSON.stringify({
+                  'success': false, 'table': reqTable, 'tag': reqTag
+                }));
               }
 
               // MQのリクエストキューに送信
@@ -72,12 +80,20 @@ const server = http.createServer(async (req, res) => {
               try {
                 await ddbUpdate(reqTable, reqTag);
                 await ddbDelete(oppTable, reqTag);
-                res.writeHead(200, {'Content-Type': 'application/json;charset=utf-8'});
-                res.write(JSON.stringify({'success': true, 'table': reqTable, 'tag': reqTag}));
+                res.writeHead(200, {
+                  'Content-Type': 'application/json;charset=utf-8'
+                });
+                res.write(JSON.stringify({
+                  'success': true, 'table': reqTable, 'tag': reqTag
+                }));
 
               } catch(err) {
-                res.writeHead(503, {'Content-Type': 'application/json;charset=utf-8'});
-                res.write(JSON.stringify({'success': false, 'table': reqTable, 'tag': reqTag}));
+                res.writeHead(503, {
+                  'Content-Type': 'application/json;charset=utf-8'
+                });
+                res.write(JSON.stringify({
+                  'success': false, 'table': reqTable, 'tag': reqTag
+                }));
               }
 
               // MQのリクエストキューに送信
@@ -98,8 +114,12 @@ const server = http.createServer(async (req, res) => {
   } else {
     // リクエストの例外処理
     const exceptMsg = appConfig.api.exceptMsg;
-    res.writeHead(400, {'Content-Type': 'application/json;charset=utf-8'});
-    res.write(JSON.stringify({'success': false, 'status': exceptMsg}));
+    res.writeHead(400, {
+      'Content-Type': 'application/json;charset=utf-8'
+    });
+    res.write(JSON.stringify({
+      'success': false, 'status': exceptMsg
+    }));
     res.end();
   }
 });
