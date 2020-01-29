@@ -49,7 +49,7 @@ exports.dlPosts = async () => {
         console.log(err);
       }
     }
-  
+
     const dlTable = appConfig.ddb.dlTable;
     if (tagMsg === undefined) {
       // 取得できなかった場合は通常キューにメッセージを補充
@@ -92,7 +92,7 @@ exports.dlPosts = async () => {
       } catch(err) {
         console.log(JSON.stringify(err));
         continue;
-      } 
+      }
 
       if (itemCheck.Items.length === 0) {
         console.log('Skipped:' + tagKey);
@@ -179,7 +179,7 @@ exports.dlPosts = async () => {
               }
 
               // ダウンロード リクエスト
-              const refererUrl = appConfig.req.dl.refererUrl + postId;              
+              const refererUrl = appConfig.req.dl.refererUrl + postId;
               try {
                 await req.dlContent(filePath, fileUrl, refererUrl);
                 console.log(postId);
@@ -246,7 +246,7 @@ exports.dlPosts = async () => {
           },
           UpdateExpression: 'SET #l = :newLast'
         };
-      
+
         try {
           await ddb.updateItem(updParams);
         } catch(err) {

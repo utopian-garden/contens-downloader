@@ -46,7 +46,7 @@ exports.favPosts = async () => {
         console.log(err);
       }
     }
-  
+
     const favTable = appConfig.ddb.favTable;
     if (tagMsg === undefined) {
       // 取得できなかった場合はメッセージを補充
@@ -62,7 +62,7 @@ exports.favPosts = async () => {
       } catch(err) {
         console.log(JSON.stringify(err));
       }
-  
+
       // メッセージ送信
       for (let item of favItems) {
         const msgItem = JSON.stringify(item);
@@ -89,7 +89,7 @@ exports.favPosts = async () => {
       } catch(err) {
         console.log(JSON.stringify(err));
         continue;
-      } 
+      }
 
       if (itemCheck.Items.length === 0) {
         console.log('Skipped:' + tagKey);
@@ -118,7 +118,7 @@ exports.favPosts = async () => {
           console.log(err.message);
           continue;
         }
-        
+
         let promiseArray = [];
 
         if (searchRes !== undefined) {
@@ -126,7 +126,7 @@ exports.favPosts = async () => {
             if (pageNum === 1) {
               logger.debug(tagKey);
             }
-            
+
             break;
           }
 
@@ -154,7 +154,7 @@ exports.favPosts = async () => {
             }
           }
         }
-        
+
         await Promise.all(promiseArray)
           .then(() => {
             pageNum++;
