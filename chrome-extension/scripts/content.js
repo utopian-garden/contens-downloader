@@ -38,8 +38,14 @@ window.onload = () => {
 // DOM変化時の処理
 const observer = new MutationObserver(() => {
   document.querySelectorAll('[class*="favorited"]').forEach(img => {
-    img.parentNode.href = 'javascript:disabledLink();void(0)';
     img.style.webkitFilter = "saturate(0%)";
+
+    const disabledLink = () => {
+      window.open(img.parentNode.linkUrl);
+    };
+    img.parentNode.linkUrl = img.parentNode.href;
+    img.parentNode.removeAttribute('href');
+    img.parentNode.addEventListener('click', disabledLink);
   });
 });
 

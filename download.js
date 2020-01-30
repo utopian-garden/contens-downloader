@@ -150,8 +150,10 @@ exports.dlPosts = async () => {
             const extension = fileUrl.split('/').pop().split('?').shift()
                 .split('.').pop();
             const fileName = postId + '.' + extension;
-            const tagDir = path.join(appConfig.fs.dlDir, tagKey);
-            const histDir = path.join(appConfig.fs.histDir, tagKey);
+            const tagDir = path.join(appConfig.fs.dlDir, tagKey)
+                .replace(/\.+$/,'');  // Winフォルダ禁止文字への対応
+            const histDir = path.join(appConfig.fs.histDir, tagKey)
+                .replace(/\.+$/,'');  // Winフォルダ禁止文字への対応
             const filePath = path.join(tagDir, fileName);
 
             // ファイルの存在チェック
