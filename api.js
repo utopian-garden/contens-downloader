@@ -42,8 +42,10 @@ const server = http.createServer(async (req, res) => {
             case favTable:
               // Favorite に登録する場合は既存のDLフォルダを削除
               const dlDir = appConfig.fs.dlDir;
+              const dlDir = appConfig.fs.histDir;
               try {
                 fs.removeSync(path.join(dlDir, reqTag));
+                fs.removeSync(path.join(histDir, reqTag));
               } catch(err) {
                 console.log(err);
               }

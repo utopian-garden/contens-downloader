@@ -118,8 +118,19 @@ exports.dlPosts = async () => {
         try {
           searchRes = await req.searchPost(tagKey, pageNum, authToken);
         } catch(err) {
-          console.log(err.message);
-          continue;
+          switch (err.statusCode) {
+            case 401:
+              try {
+                authToken = await req.getToken();
+              } catch(err) {
+                console.log(err.message);
+              }
+              break;
+            default:
+              console.log(err.message);
+              continue page_loop;
+          }
+
         }
 
         let promiseArray = [];
@@ -203,7 +214,18 @@ exports.dlPosts = async () => {
               try {
                 await req.favPost(postId, authToken);
               } catch(err) {
-                console.log(err);
+                switch (err.statusCode) {
+                  case 401:
+                    try {
+                      authToken = await req.getToken();
+                    } catch(err) {
+                      console.log(err.message);
+                    }
+                    break;
+                  default:
+                    console.log(err.message);
+                    continue page_loop;
+                }
               }
             }
 
@@ -217,7 +239,18 @@ exports.dlPosts = async () => {
               try {
                 await req.votePost(postId, authToken);
               } catch(err) {
-                console.log(err);
+                switch (err.statusCode) {
+                  case 401:
+                    try {
+                      authToken = await req.getToken();
+                    } catch(err) {
+                      console.log(err.message);
+                    }
+                    break;
+                  default:
+                    console.log(err.message);
+                    continue page_loop;
+                }
               }
             }
           }
