@@ -6,6 +6,17 @@
     "orderFile":"Order.bat",
     "listFile":"List.txt"
   },
+  "assort": {
+    "assortRule": [
+      {"fileExt": ".jpg", "fileType": "画像"},
+      {"fileExt": ".png", "fileType": "画像"},
+      {"fileExt": ".gif", "fileType": "gif"},
+      {"fileExt": ".swf", "fileType": "swf"},
+      {"fileExt": ".webm", "fileType": "動画"},
+      {"fileExt": ".ogv", "fileType": "動画"},
+      {"fileExt": ".mp4", "fileType": "動画"}
+    ]
+  },
   "api": {
     "addItemUri": "/addItem",
     "exceptMsg": "Invalid Request"
@@ -18,7 +29,7 @@
       "userName" : "user",
       "passWord" : "pass",
       "authUrl": "https://api.sample.com/auth/token?lang=japanese",
-      "authPrefix": "Bearer "  
+      "authPrefix": "Bearer "
     },
     "search" : {
       "searchUrl" : "https://api.sample.com/posts?tags=",
@@ -39,7 +50,7 @@
   "ddb": {
     "dlTable": "Download",
     "favTable": "Favorite",
-    "tagKey": "tag",
+    "tagAttr": "tag",
     "lastAttr": "last"
   },
   "sqs": {
