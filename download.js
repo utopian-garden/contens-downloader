@@ -24,7 +24,7 @@ exports.dlPosts = async () => {
   // ループ処理開始
   while (true) {
     // 優先キューからメッセージを取得
-    const priorDlQueUrl = appConfig.sqs.priorDlQueUrl;
+    const priorDlQueUrl = appConfig.mq.url.priorDlQueUrl;
     const recvParams = {
       QueueUrl: priorDlQueUrl,
     };
@@ -37,7 +37,7 @@ exports.dlPosts = async () => {
     }
 
     // 通常キューからメッセージを取得
-    const dlQueUrl = appConfig.sqs.dlQueUrl;
+    const dlQueUrl = appConfig.mq.url.dlQueUrl;
     if (tagMsg === undefined) {
       const recvParams = {
         QueueUrl: dlQueUrl,
@@ -50,35 +50,20 @@ exports.dlPosts = async () => {
       }
     }
 
-    const dlTable = appConfig.ddb.dlTable;
+    const dlTable = appConfig.db.tab.dlTable;
+    const dlQuePoll = appConfig.mq.poll.dlQuePoll;
     if (tagMsg === undefined) {
-      // 取得できなかった場合は通常キューにメッセージを補充
-
-      // DBスキャン
-      const searchParams = {
-        TableName: dlTable,
+      // メッセージがない場合はスキップ
+      console.log('Waiting for message...');
+      const waitMsg = (dlQuePoll) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(resolve, dlQuePoll * 1000);
+        });
       };
-
-      let tagItems = [];
-      try {
-        tagItems = await ddb.scanAll(searchParams);
-      } catch(err) {
-        console.log(err.message);
-      }
-
-      // 通常キューにメッセージを送信
-      for (let items of tagItems) {
-        const item = JSON.stringify(items);
-        const sendParams = {
-          MessageBody: item,
-          QueueUrl: dlQueUrl,
-          DelaySeconds: 0,
-        };
-        sqs.sendMsg(sendParams);
-      }
+      await waitMsg(dlQuePoll);
     } else {
       // DB整合性チェック
-      const tagAttr = appConfig.ddb.tagAttr;
+      const tagAttr = appConfig.db.attr.tagAttr;
       const tagKey = tagMsg.tag;
       const checkParams = {
         TableName: dlTable,
@@ -267,7 +252,7 @@ exports.dlPosts = async () => {
 
       // 最新Postを更新
       if (newLast > curLast) {
-        const lastAttr = appConfig.ddb.lastAttr;
+        const lastAttr = appConfig.db.attr.lastAttr;
         const updParams = {
           TableName: dlTable,
           Key: {

@@ -3,8 +3,8 @@
     "dlDir": "./downloads",
     "histDir": "./downloads/_history",
     "toolDir": "./_tools",
-    "orderFile":"Order.bat",
-    "listFile":"List.txt"
+    "orderFile": "Order.bat",
+    "listFile": "List.txt"
   },
   "assort": {
     "assortRule": [
@@ -19,44 +19,55 @@
   },
   "api": {
     "addItemUri": "/addItem",
+    "chkDbUri": "/checkDb",
     "exceptMsg": "Invalid Request"
   },
   "req": {
-    "common" : {
-      "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.123 Safari/537.36"
+    "common": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.123 Safari/537.36"
     },
-    "auth" : {
-      "userName" : "user",
-      "passWord" : "pass",
+    "auth": {
+      "userName": "user",
+      "passWord": "pass",
       "authUrl": "https://api.sample.com/auth/token?lang=japanese",
       "authPrefix": "Bearer "
     },
-    "search" : {
-      "searchUrl" : "https://api.sample.com/posts?tags=",
-      "searchParam" : "+-rating:safe&limit=100&page="
+    "search": {
+      "searchUrl": "https://api.sample.com/posts?tags=",
+      "searchParam": "+-rating:safe&limit=100&page="
     },
-    "fav" : {
-      "favUrl" : "https://api.sample.com/posts/",
-      "favParam" : "/favorite?language=japanese"
+    "fav": {
+      "favUrl": "https://api.sample.com/posts/",
+      "favParam": "/favorite?language=japanese"
     },
-    "vote" : {
+    "vote": {
       "voteUrl": "https://api.sample.com/posts/",
       "voteParam": "/vote?language=japanese"
     },
-    "dl" : {
+    "dl": {
       "refererUrl": "https://www.sample.com/ja/post/show/"
     }
   },
-  "ddb": {
-    "dlTable": "Download",
-    "favTable": "Favorite",
-    "tagAttr": "tag",
-    "lastAttr": "last"
+  "db": {
+    "tab": {
+      "dlTable": "Download",
+      "favTable": "Favorite"
+    },
+    "attr": {
+      "tagAttr": "tag",
+      "lastAttr": "last"
+    }
   },
-  "sqs": {
-    "dlQueUrl": "http://localhost:9324/queue/Download",
-    "priorDlQueUrl": "http://localhost:9324/queue/priorDownload",
-    "favQueUrl": "http://localhost:9324/queue/Favorite",
-    "priorFavQueUrl": "http://localhost:9324/queue/priorFavorite"
+  "mq": {
+    "url": {
+      "dlQueUrl": "http://localhost:9324/queue/Download",
+      "priorDlQueUrl": "http://localhost:9324/queue/priorDownload",
+      "favQueUrl": "http://localhost:9324/queue/Favorite",
+      "priorFavQueUrl": "http://localhost:9324/queue/priorFavorite"
+    },
+    "poll": {
+      "dlQuePoll": "10",
+      "favQuePoll": "10"
+    }
   }
 }

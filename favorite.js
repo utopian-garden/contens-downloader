@@ -22,7 +22,7 @@ exports.favPosts = async () => {
   // ループ処理開始
   while (true) {
     // 優先メッセージ取得
-    const priorFavQueUrl = appConfig.sqs.priorFavQueUrl;
+    const priorFavQueUrl = appConfig.mq.url.priorFavQueUrl;
     const recvParams = {
       QueueUrl: priorFavQueUrl,
     };
@@ -35,7 +35,7 @@ exports.favPosts = async () => {
     }
 
     // メッセージ取得
-    const favQueUrl = appConfig.sqs.favQueUrl;
+    const favQueUrl = appConfig.mq.url.favQueUrl;
     if (tagMsg === undefined) {
       const recvParams = {
         QueueUrl: favQueUrl,
@@ -47,35 +47,21 @@ exports.favPosts = async () => {
       }
     }
 
-    const favTable = appConfig.ddb.favTable;
+    const favTable = appConfig.db.tab.favTable;
+    const favQuePoll = appConfig.mq.poll.favQuePoll;
     if (tagMsg === undefined) {
-      // 取得できなかった場合はメッセージを補充
+      // メッセージがない場合はスキップ
+      console.log('Waiting for message...');
 
-      // DBスキャン
-      const searchParams = {
-        TableName: favTable,
+      const waitMsg = (favQuePoll) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(resolve, favQuePoll * 1000);
+        });
       };
-
-      let favItems = [];
-      try {
-        favItems = await ddb.scanAll(searchParams);
-      } catch(err) {
-        console.log(JSON.stringify(err));
-      }
-
-      // メッセージ送信
-      for (let item of favItems) {
-        const msgItem = JSON.stringify(item);
-        const sendParams = {
-          MessageBody: msgItem,
-          QueueUrl: favQueUrl,
-          DelaySeconds: 0,
-        };
-        sqs.sendMsg(sendParams);
-      }
+      await waitMsg(favQuePoll);
     } else {
       // DB整合性チェック
-      const tagAttr = appConfig.ddb.tagAttr;
+      const tagAttr = appConfig.db.attr.tagAttr;
       const tagKey = tagMsg.tag;
       const checkParams = {
         TableName: favTable,
@@ -187,7 +173,7 @@ exports.favPosts = async () => {
 
       // 最新Postを更新
       if (newLast > curLast) {
-        const lastAttr = appConfig.ddb.lastAttr;
+        const lastAttr = appConfig.db.attr.lastAttr;
         const updParams = {
           TableName: favTable,
           Key: {

@@ -4,20 +4,75 @@ const fs = require('fs-extra');
 const path = require('path');
 const http = require('http');
 const url = require('url');
+const qs = require('querystring')
 const ddb = require('./lib/ddb.js');
+const dbCheck = require('./lib/db-check.js')
 const sqs = require('./lib/sqs.js');
 const appConfig = require('./config/app-config.json');
 
 const server = http.createServer(async (req, res) => {
-  const reqUri = url.parse(req.url).pathname;
+  const reqUri = url.parse(req.url);
+  const reqApi = reqUri.pathname;
+  const reqQuery = qs.parse(reqUri.query);
+  const dlTable = appConfig.db.tab.dlTable;
+  const favTable = appConfig.db.tab.favTable;
+  let reqTag;
+  let reqTable;
 
   if (req.method === 'OPTIONS') {
     // Chrome の CORS 回避
     res.writeHead(200, {
       'Access-Control-Allow-Origin':'*',
-      'Access-Control-Allow-Methods':'POST',
+      'Access-Control-Allow-Methods':'GET,POST',
       'Access-Control-Allow-Headers':'content-type'
     });
+    res.end();
+  } else if (req.method === 'GET') {
+    const chkDbUri = appConfig.api.chkDbUri;
+    reqTag = reqQuery.tag;
+
+    switch (reqApi) {
+      // DBチェックの処理
+      case chkDbUri:
+        try {
+          const resTable = await dbCheck.checkTag(reqTag);
+
+          res.writeHead(200, {
+            'Access-Control-Allow-Origin':'*',
+            'Content-Type': 'application/json;charset=utf-8'
+          });
+          res.write(JSON.stringify({
+            'success': true, 'table': resTable, 'tag': reqTag
+          }));
+        } catch(err) {
+          console.log(err.message);
+
+          res.writeHead(503, {
+            'Access-Control-Allow-Origin':'*',
+            'Content-Type': 'application/json;charset=utf-8'
+          });
+          res.write(JSON.stringify({
+            'success': false, 'tag': reqTag
+          }));
+        }
+
+        break;
+
+      default:
+        // リクエストの例外処理
+        const exceptMsg = appConfig.api.exceptMsg;
+        res.writeHead(400, {
+          'Access-Control-Allow-Origin':'*',
+          'Content-Type': 'application/json;charset=utf-8'
+        });
+        res.write(JSON.stringify({
+          'success': false, 'status': exceptMsg
+        }));
+        res.end();
+
+        break;
+    }
+
     res.end();
   } else if (req.method === 'POST') {
     let body = '';
@@ -27,12 +82,10 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       const reqBody = JSON.parse(body);
       const addItemUri = appConfig.api.addItemUri;
-      const dlTable = appConfig.ddb.dlTable;
-      const favTable = appConfig.ddb.favTable;
-      const reqTag = reqBody.tag;
-      const reqTable = reqBody.table;
+      reqTable = reqBody.table;
+      reqTag = reqBody.tag;
 
-      switch (reqUri) {
+      switch (reqApi) {
         // アイテムの追加/削除処理
         case addItemUri:
           // 入力チェック
@@ -40,39 +93,44 @@ const server = http.createServer(async (req, res) => {
 
           switch (reqTable) {
             case favTable:
-              // Favorite に登録する場合は既存のDLフォルダを削除
-              const dlDir = appConfig.fs.dlDir;
-              const dlDir = appConfig.fs.histDir;
-              try {
-                fs.removeSync(path.join(dlDir, reqTag));
-                fs.removeSync(path.join(histDir, reqTag));
-              } catch(err) {
-                console.log(err);
-              }
-
               // DBの更新/削除
               oppTable = dlTable;
               try {
                 await ddbUpdate(reqTable, reqTag);
                 await ddbDelete(oppTable, reqTag);
+
                 res.writeHead(200, {
+                  'Access-Control-Allow-Origin':'*',
                   'Content-Type': 'application/json;charset=utf-8'
                 });
                 res.write(JSON.stringify({
                   'success': true, 'table': reqTable, 'tag': reqTag
                 }));
               } catch(err) {
+                console.log(err.message);
+
                 res.writeHead(503, {
+                  'Access-Control-Allow-Origin':'*',
                   'Content-Type': 'application/json;charset=utf-8'
                 });
                 res.write(JSON.stringify({
-                  'success': false, 'table': reqTable, 'tag': reqTag
+                  'success': false, 'tag': reqTag
                 }));
               }
 
               // MQのリクエストキューに送信
-              const priorFavQueUrl = appConfig.sqs.priorFavQueUrl;
+              const priorFavQueUrl = appConfig.mq.url.priorFavQueUrl;
               await sendMessage(priorFavQueUrl, reqTag);
+
+              // Favorite に登録する場合は既存のDLフォルダを削除
+              const dlDir = appConfig.fs.dlDir;
+              const histDir = appConfig.fs.histDir;
+              try {
+                fs.removeSync(path.join(dlDir, reqTag));
+                fs.removeSync(path.join(histDir, reqTag));
+              } catch(err) {
+                console.log(err);
+              }
 
               break;
 
@@ -82,31 +140,46 @@ const server = http.createServer(async (req, res) => {
               try {
                 await ddbUpdate(reqTable, reqTag);
                 await ddbDelete(oppTable, reqTag);
+
                 res.writeHead(200, {
+                  'Access-Control-Allow-Origin':'*',
                   'Content-Type': 'application/json;charset=utf-8'
                 });
                 res.write(JSON.stringify({
                   'success': true, 'table': reqTable, 'tag': reqTag
                 }));
-
               } catch(err) {
+                console.log(err.message);
+
                 res.writeHead(503, {
+                  'Access-Control-Allow-Origin':'*',
                   'Content-Type': 'application/json;charset=utf-8'
                 });
                 res.write(JSON.stringify({
-                  'success': false, 'table': reqTable, 'tag': reqTag
+                  'success': false, 'tag': reqTag
                 }));
               }
 
               // MQのリクエストキューに送信
-              const priorDlQueUrl = appConfig.sqs.priorDlQueUrl;
+              const priorDlQueUrl = appConfig.mq.url.priorDlQueUrl;
               await sendMessage(priorDlQueUrl, reqTag);
 
               break;
-
-            default:
-              break;
           }
+
+          break;
+
+        default:
+          // リクエストの例外処理
+          const exceptMsg = appConfig.api.exceptMsg;
+          res.writeHead(400, {
+            'Access-Control-Allow-Origin':'*',
+            'Content-Type': 'application/json;charset=utf-8'
+          });
+          res.write(JSON.stringify({
+            'success': false, 'status': exceptMsg
+          }));
+          res.end();
 
           break;
       }
@@ -117,6 +190,7 @@ const server = http.createServer(async (req, res) => {
     // リクエストの例外処理
     const exceptMsg = appConfig.api.exceptMsg;
     res.writeHead(400, {
+      'Access-Control-Allow-Origin':'*',
       'Content-Type': 'application/json;charset=utf-8'
     });
     res.write(JSON.stringify({
