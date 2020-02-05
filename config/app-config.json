@@ -15,12 +15,19 @@
       {"fileExt": ".webm", "fileType": "動画"},
       {"fileExt": ".ogv", "fileType": "動画"},
       {"fileExt": ".mp4", "fileType": "動画"}
-    ]
+    ],
+    "fileThre": 500
   },
   "api": {
-    "addItemUri": "/addItem",
-    "chkDbUri": "/checkDb",
-    "exceptMsg": "Invalid Request"
+    "uri": {
+      "addItemUri": "/addItem",
+      "refillUri": "/refillQueue",
+      "organizeUri": "/organizeFile",
+      "chkDbUri": "/checkDb"
+    },
+    "msg": {
+      "exceptMsg": "Invalid Request"
+    }
   },
   "req": {
     "common": {

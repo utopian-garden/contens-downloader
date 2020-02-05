@@ -2,12 +2,12 @@
 
 const log4js = require('log4js');
 log4js.configure('./config/fav-log-config.json');
-const req = require('./lib/req.js');
-const ddb = require('./lib/ddb.js');
-const sqs = require('./lib/sqs.js');
+const req = require('./lib/req');
+const ddb = require('./lib/ddb');
+const sqs = require('./lib/sqs');
 const appConfig = require('./config/app-config.json');
 
-// 無名非同期関数によるメイン処理
+// ポストのお気に入り処理
 exports.favPosts = async () => {
   const logger = log4js.getLogger('system');
 
@@ -21,7 +21,7 @@ exports.favPosts = async () => {
 
   // ループ処理開始
   while (true) {
-    // 優先メッセージ取得
+    // 優先キューからメッセージを取得
     const priorFavQueUrl = appConfig.mq.url.priorFavQueUrl;
     const recvParams = {
       QueueUrl: priorFavQueUrl,
@@ -34,7 +34,7 @@ exports.favPosts = async () => {
       console.log(err);
     }
 
-    // メッセージ取得
+    // 通常キューからメッセージを取得
     const favQueUrl = appConfig.mq.url.favQueUrl;
     if (tagMsg === undefined) {
       const recvParams = {
@@ -47,10 +47,10 @@ exports.favPosts = async () => {
       }
     }
 
+    // メッセージが取得できない場合は待機
     const favTable = appConfig.db.tab.favTable;
     const favQuePoll = appConfig.mq.poll.favQuePoll;
     if (tagMsg === undefined) {
-      // メッセージがない場合はスキップ
       console.log('Waiting for message...');
 
       const waitMsg = (favQuePoll) => {
@@ -91,7 +91,7 @@ exports.favPosts = async () => {
       let pageNum = 1;
       let newLast = 0;
 
-      // ページでループ
+      // ページ数でループ
       page_loop:
       while (true) {
         console.log(tagKey, pageNum);
@@ -115,8 +115,7 @@ exports.favPosts = async () => {
           }
         }
 
-        let promiseArray = [];
-
+        // 続行条件のチェック
         if (searchRes !== undefined) {
           if (searchRes.length === 0) {
             if (pageNum === 1) {
@@ -126,8 +125,8 @@ exports.favPosts = async () => {
             break;
           }
 
+          // 最新Post番号の取得
           if (pageNum === 1) {
-            // 最新Post番号の取得
             newLast = searchRes[0].id;
           }
 
@@ -141,7 +140,6 @@ exports.favPosts = async () => {
             // お気に入りリクエスト
             const isFaved = searchRes[i].is_favorited;
             if (!isFaved) {
-              //promiseArray.push(req.favPost(postId, authToken));
               try {
                 await req.favPost(postId, authToken);
               } catch(err) {
@@ -162,16 +160,10 @@ exports.favPosts = async () => {
           }
         }
 
-        await Promise.all(promiseArray)
-          .then(() => {
-            pageNum++;
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        pageNum++;
       }
 
-      // 最新Postを更新
+      // 最新ポスト番号をDBに反映
       if (newLast > curLast) {
         const lastAttr = appConfig.db.attr.lastAttr;
         const updParams = {

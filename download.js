@@ -2,14 +2,16 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const sanitize = require('sanitize-filename');
 const log4js = require('log4js');
 log4js.configure('./config/dl-log-config.json');
-const req = require('./lib/req.js');
-const ddb = require('./lib/ddb.js');
-const sqs = require('./lib/sqs.js');
-const walk = require('./lib/walk.js');
+const req = require('./lib/req');
+const ddb = require('./lib/ddb');
+const sqs = require('./lib/sqs');
+const walk = require('./lib/walk');
 const appConfig = require('./config/app-config.json');
 
+// ポストのダウンロード処理
 exports.dlPosts = async () => {
   const logger = log4js.getLogger('system');
 
@@ -50,10 +52,10 @@ exports.dlPosts = async () => {
       }
     }
 
+    // メッセージが取得できない場合は待機
     const dlTable = appConfig.db.tab.dlTable;
     const dlQuePoll = appConfig.mq.poll.dlQuePoll;
     if (tagMsg === undefined) {
-      // メッセージがない場合はスキップ
       console.log('Waiting for message...');
       const waitMsg = (dlQuePoll) => {
         return new Promise((resolve, reject) => {
@@ -62,7 +64,7 @@ exports.dlPosts = async () => {
       };
       await waitMsg(dlQuePoll);
     } else {
-      // DB整合性チェック
+      // DBの整合性チェック
       const tagAttr = appConfig.db.attr.tagAttr;
       const tagKey = tagMsg.tag;
       const checkParams = {
@@ -93,7 +95,7 @@ exports.dlPosts = async () => {
       let pageNum = 1;
       let newLast = 0;
 
-      // ページでループ
+      // ページ数でループ
       page_loop:
       while (true) {
         console.log(tagKey, pageNum);
@@ -118,8 +120,7 @@ exports.dlPosts = async () => {
 
         }
 
-        let promiseArray = [];
-
+        // 続行条件のチェック
         if (searchRes !== undefined) {
           if (searchRes.length === 0) {
             if (pageNum === 1) {
@@ -129,8 +130,8 @@ exports.dlPosts = async () => {
             break;
           }
 
+          // 最新Post番号の取得
           if (pageNum === 1) {
-            // 最新Post番号の取得
             newLast = searchRes[0].id;
           }
 
@@ -146,15 +147,13 @@ exports.dlPosts = async () => {
             const extension = fileUrl.split('/').pop().split('?').shift()
                 .split('.').pop();
             const fileName = postId + '.' + extension;
-            const tagDir = path.join(appConfig.fs.dlDir, tagKey)
-                .replace(/\.+$/,'');  // Winフォルダ禁止文字への対応
-            const histDir = path.join(appConfig.fs.histDir, tagKey)
-                .replace(/\.+$/,'');  // Winフォルダ禁止文字への対応
+            const tagDir = path.join(appConfig.fs.dlDir, sanitize(tagKey));
+            const histTagDir = path.join(appConfig.fs.histDir, sanitize(tagKey));
             const filePath = path.join(tagDir, fileName);
 
             // ファイルの存在チェック
             if (!await walk.walkExistsSync(tagDir, fileName) &&
-                !await walk.walkExistsSync(histDir, fileName)) {
+                !await walk.walkExistsSync(histTagDir, fileName)) {
 
               // ディレクトリの作成
               fs.ensureDirSync(tagDir);
@@ -195,34 +194,8 @@ exports.dlPosts = async () => {
             // お気に入りリクエスト
             const isFaved = searchRes[i].is_favorited;
             if (!isFaved) {
-              //promiseArray.push(req.favPost(postId, authToken));
               try {
                 await req.favPost(postId, authToken);
-              } catch(err) {
-                switch (err.statusCode) {
-                  case 401:
-                    try {
-                      authToken = await req.getToken();
-                    } catch(err) {
-                      console.log(err.message);
-                    }
-                    break;
-                  default:
-                    console.log(err.message);
-                    continue page_loop;
-                }
-              }
-            }
-
-            // 投票リクエスト
-            let userVote = searchRes[i].user_vote;
-            if (userVote === undefined) {
-              userVote = 0;
-            }
-            if (userVote > 0) {
-              //promiseArray.push(req.votePost(postId, authToken));
-              try {
-                await req.votePost(postId, authToken);
               } catch(err) {
                 switch (err.statusCode) {
                   case 401:
@@ -241,16 +214,10 @@ exports.dlPosts = async () => {
           }
         }
 
-        await Promise.all(promiseArray)
-          .then(() => {
-            pageNum++;
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        pageNum++;
       }
 
-      // 最新Postを更新
+      // 最新ポスト番号をDBに反映
       if (newLast > curLast) {
         const lastAttr = appConfig.db.attr.lastAttr;
         const updParams = {

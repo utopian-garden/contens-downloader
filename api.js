@@ -2,12 +2,14 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const sanitize = require('sanitize-filename');
 const http = require('http');
 const url = require('url');
 const qs = require('querystring')
-const ddb = require('./lib/ddb.js');
-const dbCheck = require('./lib/db-check.js')
-const sqs = require('./lib/sqs.js');
+const ddb = require('./lib/ddb');
+const sqs = require('./lib/sqs');
+const organize = require('./lib/file-organize');
+const refill = require('./lib/mq-refill')
 const appConfig = require('./config/app-config.json');
 
 const server = http.createServer(async (req, res) => {
@@ -28,14 +30,22 @@ const server = http.createServer(async (req, res) => {
     });
     res.end();
   } else if (req.method === 'GET') {
-    const chkDbUri = appConfig.api.chkDbUri;
+    const chkDbUri = appConfig.api.uri.chkDbUri;
     reqTag = reqQuery.tag;
 
     switch (reqApi) {
       // DBチェックの処理
       case chkDbUri:
         try {
-          const resTable = await dbCheck.checkTag(reqTag);
+          const dlCount = await ddbCount(reqTag, dlTable);
+          const favCount = await ddbCount(reqTag, favTable);
+          let resTable = 'None';
+
+          if (dlCount > favCount) {
+            resTable = dlTable;
+          } else if (favCount > dlCount) {
+            resTable = favTable;
+          }
 
           res.writeHead(200, {
             'Access-Control-Allow-Origin':'*',
@@ -58,9 +68,9 @@ const server = http.createServer(async (req, res) => {
 
         break;
 
+      // リクエストの例外処理
       default:
-        // リクエストの例外処理
-        const exceptMsg = appConfig.api.exceptMsg;
+        const exceptMsg = appConfig.api.uri.exceptMsg;
         res.writeHead(400, {
           'Access-Control-Allow-Origin':'*',
           'Content-Type': 'application/json;charset=utf-8'
@@ -81,19 +91,21 @@ const server = http.createServer(async (req, res) => {
     });
     req.on('end', async () => {
       const reqBody = JSON.parse(body);
-      const addItemUri = appConfig.api.addItemUri;
-      reqTable = reqBody.table;
-      reqTag = reqBody.tag;
+      const addItemUri = appConfig.api.uri.addItemUri;
+      const refillUri = appConfig.api.uri.refillUri;
+      const organizeUri = appConfig.api.uri.organizeUri;
 
       switch (reqApi) {
         // アイテムの追加/削除処理
         case addItemUri:
-          // 入力チェック
           let oppTable;
+          reqTable = reqBody.table;
+          reqTag = reqBody.tag;
 
+          // 入力チェック
           switch (reqTable) {
+            // Favorite テーブルの更新と Download テーブルの削除
             case favTable:
-              // DBの更新/削除
               oppTable = dlTable;
               try {
                 await ddbUpdate(reqTable, reqTag);
@@ -118,24 +130,24 @@ const server = http.createServer(async (req, res) => {
                 }));
               }
 
-              // MQのリクエストキューに送信
+              // MQのリクエストキューにメッセージを送信
               const priorFavQueUrl = appConfig.mq.url.priorFavQueUrl;
               await sendMessage(priorFavQueUrl, reqTag);
 
               // Favorite に登録する場合は既存のDLフォルダを削除
-              const dlDir = appConfig.fs.dlDir;
-              const histDir = appConfig.fs.histDir;
+              const tagDir = path.join(appConfig.fs.dlDir, sanitize(reqTag));
+              const histTagDir = path.join(appConfig.fs.histDir, sanitize(reqTag));
               try {
-                fs.removeSync(path.join(dlDir, reqTag));
-                fs.removeSync(path.join(histDir, reqTag));
+                fs.removeSync(tagDir);
+                fs.removeSync(histTagDir);
               } catch(err) {
                 console.log(err);
               }
 
               break;
 
+            // Download テーブルの更新と Favorite テーブルの削除
             case dlTable:
-              // DBの更新/削除
               oppTable = favTable;
               try {
                 await ddbUpdate(reqTable, reqTag);
@@ -160,7 +172,7 @@ const server = http.createServer(async (req, res) => {
                 }));
               }
 
-              // MQのリクエストキューに送信
+              // MQのリクエストキューにメッセージを送信
               const priorDlQueUrl = appConfig.mq.url.priorDlQueUrl;
               await sendMessage(priorDlQueUrl, reqTag);
 
@@ -169,9 +181,43 @@ const server = http.createServer(async (req, res) => {
 
           break;
 
+        // MQのリクエストキューにメッセージを補充
+        case refillUri:
+          reqTable = reqBody.table;
+          refill.mqRefill(reqTable).catch(err => {
+            console.log(err);
+          });
+
+          res.writeHead(200, {
+            'Access-Control-Allow-Origin':'*',
+            'Content-Type': 'application/json;charset=utf-8'
+          });
+          res.write(JSON.stringify({
+            'accept': true, 'table': reqTable
+          }));
+
+          break;
+
+        // ファイルの整理
+        case organizeUri:
+          const fileThre = appConfig.assort.fileThre;
+          organize.fileOrganize(fileThre).catch(err => {
+            console.log(err);
+          });
+
+          res.writeHead(200, {
+            'Access-Control-Allow-Origin':'*',
+            'Content-Type': 'application/json;charset=utf-8'
+          });
+          res.write(JSON.stringify({
+            'accept': true
+          }));
+
+          break;
+
+        // リクエストの例外処理
         default:
-          // リクエストの例外処理
-          const exceptMsg = appConfig.api.exceptMsg;
+          const exceptMsg = appConfig.api.msg.exceptMsg;
           res.writeHead(400, {
             'Access-Control-Allow-Origin':'*',
             'Content-Type': 'application/json;charset=utf-8'
@@ -188,7 +234,7 @@ const server = http.createServer(async (req, res) => {
     });
   } else {
     // リクエストの例外処理
-    const exceptMsg = appConfig.api.exceptMsg;
+    const exceptMsg = appConfig.api.msg.exceptMsg;
     res.writeHead(400, {
       'Access-Control-Allow-Origin':'*',
       'Content-Type': 'application/json;charset=utf-8'
@@ -199,6 +245,24 @@ const server = http.createServer(async (req, res) => {
     res.end();
   }
 });
+
+// DB検索
+const ddbCount = async (tagKey, reqTable) => {
+  const cntParams = {
+    TableName: reqTable,
+    ExpressionAttributeNames:{'#d': 'tag'},
+    ExpressionAttributeValues:{':val': tagKey},
+    KeyConditionExpression: '#d = :val'
+  };
+
+  try {
+    let dbItems = await ddb.queryItem(cntParams);
+    return dbItems.Items.length;
+  } catch(err) {
+    console.log(JSON.stringify(err));
+    throw err;
+  }
+};
 
 // DB更新
 const ddbUpdate = async (reqTable, reqTag) => {
