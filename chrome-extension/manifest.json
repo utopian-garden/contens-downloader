@@ -6,12 +6,12 @@
   "content_scripts": [{
     "matches": ["https://*.sample.com/*"],
     "js": [
-      "js/content.js"
+      "scripts/content.js"
     ]
   }],
   "background": {
     "scripts": [
-      "js/background.js"
+      "scripts/background.js"
     ]
   },
   "permissions": [
@@ -27,7 +27,7 @@
     "popup.html"
   ],
   "browser_action": {
-    "default_title": "popup",
+    "default_title": "Contents Downloader Extension",
     "default_popup": "popup.html"
   }
 }

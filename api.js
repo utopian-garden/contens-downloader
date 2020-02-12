@@ -184,9 +184,14 @@ const server = http.createServer(async (req, res) => {
         // MQのリクエストキューにメッセージを補充
         case refillUri:
           reqTable = reqBody.table;
-          refill.mqRefill(reqTable).catch(err => {
-            console.log(err);
-          });
+          console.log('MQ refilling started: ' + reqTable);
+          refill.mqRefill(reqTable)
+            .then(res => {
+              console.log('MQ refilling finished: ' + reqTable);
+            })
+            .catch(err => {
+              console.log(err);
+            });
 
           res.writeHead(200, {
             'Access-Control-Allow-Origin':'*',
@@ -201,9 +206,14 @@ const server = http.createServer(async (req, res) => {
         // ファイルの整理
         case organizeUri:
           const fileThre = appConfig.assort.fileThre;
-          organize.fileOrganize(fileThre).catch(err => {
-            console.log(err);
-          });
+          console.log('File organization started.');
+          organize.fileOrganize(fileThre)
+            .then(res => {
+              console.log('File organization finished.');
+            })
+            .catch(err => {
+              console.log(err);
+            });
 
           res.writeHead(200, {
             'Access-Control-Allow-Origin':'*',

@@ -82,7 +82,7 @@ exports.dlPosts = async () => {
       }
 
       if (itemCheck.Items.length === 0) {
-        console.log('Skipped:' + tagKey);
+        console.log('Skipped: ' + tagKey);
         continue;
       }
 
