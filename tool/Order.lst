@@ -1,0 +1,8 @@
+extension,directory
+.jpg,image
+.png,image
+.gif,gif
+.swf,swf
+.webm,video
+.ogv,video
+.mp4,video

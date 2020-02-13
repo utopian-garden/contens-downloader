@@ -1,8 +1,15 @@
-window.onload = () => {
-  // 不要コンテンツの非表示
-  document.querySelectorAll('[class*=attachment-thumbnail]').forEach(img => {
-    img.style.display = "none";
-  });
+window.addEventListener('load', () => {
+  // 不要なコンテンツの非表示
+  let unnecessary = document.getElementById('headerthumbs');
+  if (unnecessary !== undefined && unnecessary) {
+    unnecessary.style.visibility = "hidden";
+  }
+
+  // 不快なコンテンツの非表示
+  let unpleasant = document.getElementById('p816140');
+  if (unpleasant !== undefined && unpleasant) {
+    unpleasant.style.visibility = "hidden";
+  }
 
   // お気に入り済みコンテンツのグレーアウト
   document.querySelectorAll('[class*="favorited"]').forEach(img => {
@@ -33,7 +40,7 @@ window.onload = () => {
       box.value += options;
     }
   }
-};
+});
 
 // DOM変化時の処理
 const observer = new MutationObserver(() => {
