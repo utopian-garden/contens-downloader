@@ -5,9 +5,8 @@
   "description": "Chrome Extension for Contents Downloader",
   "content_scripts": [{
     "matches": ["https://*.sample.com/*"],
-    "js": [
-      "scripts/content.js"
-    ]
+    "js": ["scripts/content.js"],
+    "css": ["css/style.css"]
   }],
   "background": {
     "scripts": [

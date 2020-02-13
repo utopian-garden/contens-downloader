@@ -1,0 +1,24 @@
+/* 不要なコンテンツの非表示 */
+#headerthumbs {
+  visibility: hidden;
+}
+
+/* 不快なコンテンツの非表示 */
+#p816140 {
+  visibility: hidden;
+}
+
+/* 特定リンクの文字サイズを変更 */
+.tag-type-artist > a {
+  font-size: 120%;
+}
+
+/* 特定リンクの文字サイズを変更 */
+.tag-type-studio > a {
+  font-size: 120%;
+}
+
+/* お気に入り済みコンテンツのグレーアウト */
+.favorited {
+  filter: saturate(0%);
+}

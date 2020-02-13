@@ -1,20 +1,6 @@
 window.addEventListener('load', () => {
-  // 不要なコンテンツの非表示
-  let unnecessary = document.getElementById('headerthumbs');
-  if (unnecessary !== undefined && unnecessary) {
-    unnecessary.style.visibility = "hidden";
-  }
-
-  // 不快なコンテンツの非表示
-  let unpleasant = document.getElementById('p816140');
-  if (unpleasant !== undefined && unpleasant) {
-    unpleasant.style.visibility = "hidden";
-  }
-
-  // お気に入り済みコンテンツのグレーアウト
+  // お気に入り済みコンテンツのリンクの挙動を変更
   document.querySelectorAll('[class*="favorited"]').forEach(img => {
-    img.style.webkitFilter = "saturate(0%)";
-
     const disabledLink = () => {
       window.open(img.parentNode.linkUrl);
     };
@@ -23,16 +9,15 @@ window.addEventListener('load', () => {
     img.parentNode.addEventListener('click', disabledLink);
   });
 
-  // 検索のオプションを追加、一部の文字サイズを変更
+  // リンクの検索オプションを追加
   document.querySelectorAll(
     '[class="tag-type-artist"] > a, [class="tag-type-studio"] > a'
   ).forEach(link => {
-    link.style.fontSize = '120%';
     link.setAttribute('href', link.getAttribute('href') +
         '+order:quality+-rating:safe');
   });
 
-  // 検索のオプションを追加
+  // 検索ボックスのオプションを追加
   const options = ' order:quality -rating:safe';
   let box = document.getElementById('tags');
   if (box && box !== undefined) {
@@ -45,8 +30,6 @@ window.addEventListener('load', () => {
 // DOM変化時の処理
 const observer = new MutationObserver(() => {
   document.querySelectorAll('[class*="favorited"]').forEach(img => {
-    img.style.webkitFilter = "saturate(0%)";
-
     const disabledLink = () => {
       window.open(img.parentNode.linkUrl);
     };
