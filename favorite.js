@@ -65,9 +65,9 @@ exports.favPosts = async () => {
       const tagKey = tagMsg.tag;
       const checkParams = {
         TableName: favTable,
-        ExpressionAttributeNames:{'#f': tagAttr},
+        ExpressionAttributeNames:{'#t': tagAttr},
         ExpressionAttributeValues:{':val': tagKey},
-        KeyConditionExpression: '#f = :val'
+        KeyConditionExpression: '#t = :val'
       };
       let itemCheck;
       try {
@@ -78,7 +78,7 @@ exports.favPosts = async () => {
       }
 
       if (itemCheck.Items.length === 0) {
-        console.log('Skipped:' + tagKey);
+        console.log('Skipped: ' + tagKey);
         continue;
       }
 

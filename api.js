@@ -184,11 +184,7 @@ const server = http.createServer(async (req, res) => {
         // MQのリクエストキューにメッセージを補充
         case refillUri:
           reqTable = reqBody.table;
-          console.log('MQ refilling started: ' + reqTable);
           refill.mqRefill(reqTable)
-            .then(res => {
-              console.log('MQ refilling finished: ' + reqTable);
-            })
             .catch(err => {
               console.log(err);
             });
@@ -205,12 +201,7 @@ const server = http.createServer(async (req, res) => {
 
         // ファイルの整理
         case organizeUri:
-          const fileThre = appConfig.assort.fileThre;
-          console.log('File organization started.');
-          organize.fileOrganize(fileThre)
-            .then(res => {
-              console.log('File organization finished.');
-            })
+          organize.fileOrganize()
             .catch(err => {
               console.log(err);
             });
@@ -258,11 +249,12 @@ const server = http.createServer(async (req, res) => {
 
 // DB検索
 const ddbCount = async (tagKey, reqTable) => {
+  const tagAttr = appConfig.db.attr.tagAttr;
   const cntParams = {
     TableName: reqTable,
-    ExpressionAttributeNames:{'#d': 'tag'},
+    ExpressionAttributeNames:{'#t': tagAttr},
     ExpressionAttributeValues:{':val': tagKey},
-    KeyConditionExpression: '#d = :val'
+    KeyConditionExpression: '#t = :val'
   };
 
   try {
@@ -328,4 +320,5 @@ const sendMessage = async (queueUrl, reqTag) => {
 
 // サーバ起動
 server.listen(3000);
-console.log('API Server started.');
+const startMsg = appConfig.api.msg.startMsg;
+console.log(startMsg);

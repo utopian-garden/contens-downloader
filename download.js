@@ -69,9 +69,9 @@ exports.dlPosts = async () => {
       const tagKey = tagMsg.tag;
       const checkParams = {
         TableName: dlTable,
-        ExpressionAttributeNames:{'#d': tagAttr},
+        ExpressionAttributeNames:{'#t': tagAttr},
         ExpressionAttributeValues:{':val': tagKey},
-        KeyConditionExpression: '#d = :val'
+        KeyConditionExpression: '#t = :val'
       };
       let itemCheck;
       try {
@@ -160,19 +160,25 @@ exports.dlPosts = async () => {
 
               // テンプレートファイルの配布
               const toolDir = appConfig.fs.toolDir;
-              const orderFile = appConfig.fs.orderFile;
-              const listFile = appConfig.fs.listFile;
-              const orderFrom = path.join(toolDir, orderFile);
-              const orderTo = path.join(tagDir, orderFile);
-              const listFrom = path.join(toolDir, listFile);
-              const listTo = path.join(tagDir, listFile);
+              const orderBat = appConfig.fs.orderBat;
+              const orderPs1 = appConfig.fs.orderPs1;
+              const orderLst = appConfig.fs.orderLst;
+              const batFrom = path.join(toolDir, orderBat);
+              const batTo = path.join(tagDir, orderBat);
+              const ps1From = path.join(toolDir, orderPs1);
+              const ps1To = path.join(tagDir, orderPs1);
+              const lstFrom = path.join(toolDir, orderLst);
+              const lstTo = path.join(tagDir, orderLst);
 
-              if (!fs.pathExistsSync(orderTo)) {
-                fs.copySync(orderFrom, orderTo);
+              if (!fs.pathExistsSync(batTo)) {
+                fs.copySync(batFrom, batTo);
               }
 
-              if (!fs.pathExistsSync(listTo)) {
-                fs.copySync(listFrom, listTo);
+              if (!fs.pathExistsSync(ps1To)) {
+                fs.copySync(ps1From, ps1To);
+              }
+              if (!fs.pathExistsSync(lstTo)) {
+                fs.copySync(lstFrom, lstTo);
               }
 
               // ダウンロード リクエスト

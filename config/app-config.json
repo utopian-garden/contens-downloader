@@ -1,22 +1,27 @@
 {
   "fs": {
-    "dlDir": "./downloads",
-    "histDir": "./downloads/_history",
-    "toolDir": "./_tools",
-    "orderFile": "Order.bat",
-    "listFile": "List.txt"
+    "dlDir": "./download",
+    "histDir": "./download/_history",
+    "toolDir": "./tool",
+    "orderBat": "Order.bat",
+    "orderPs1": "Order.ps1",
+    "orderLst": "Order.lst"
   },
-  "assort": {
+  "organize": {
     "assortRule": [
-      {"fileExt": ".jpg", "fileType": "画像"},
-      {"fileExt": ".png", "fileType": "画像"},
+      {"fileExt": ".jpg", "fileType": "image"},
+      {"fileExt": ".png", "fileType": "image"},
       {"fileExt": ".gif", "fileType": "gif"},
       {"fileExt": ".swf", "fileType": "swf"},
-      {"fileExt": ".webm", "fileType": "動画"},
-      {"fileExt": ".ogv", "fileType": "動画"},
-      {"fileExt": ".mp4", "fileType": "動画"}
+      {"fileExt": ".webm", "fileType": "video"},
+      {"fileExt": ".ogv", "fileType": "video"},
+      {"fileExt": ".mp4", "fileType": "video"}
     ],
-    "fileThre": 500
+    "fileThre": 500,
+    "msg": {
+      "startMsg": "File organization started.",
+      "finMsg": "File organization finished."
+    }
   },
   "api": {
     "uri": {
@@ -26,7 +31,8 @@
       "chkDbUri": "/checkDb"
     },
     "msg": {
-      "exceptMsg": "Invalid Request"
+      "exceptMsg": "Invalid Request",
+      "startMsg": "API Server started."
     }
   },
   "req": {
@@ -75,6 +81,10 @@
     "poll": {
       "dlQuePoll": "10",
       "favQuePoll": "10"
+    },
+    "msg": {
+      "startMsg": "MQ refilling started: ",
+      "finMsg": "MQ refilling finished: "
     }
   }
 }
