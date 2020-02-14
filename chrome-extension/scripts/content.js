@@ -25,6 +25,12 @@ window.addEventListener('load', () => {
       box.value += options;
     }
   }
+
+  // デフォルト音量の制御
+  let video = document.getElementById('image');
+  if (video.tagName === 'VIDEO') {
+    video.volume = 0.1;
+  }
 });
 
 // DOM変化時の処理
