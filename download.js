@@ -103,7 +103,8 @@ exports.dlPosts = async () => {
         // 検索リクエスト
         let searchRes;
         try {
-          searchRes = await req.searchPost(tagKey, pageNum, authToken);
+          searchRes = await req.searchPost(encodeURIComponent(tagKey), pageNum,
+              authToken);
         } catch(err) {
           switch (err.statusCode) {
             case 401:
