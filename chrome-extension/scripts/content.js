@@ -26,10 +26,12 @@ window.addEventListener('load', () => {
     }
   }
 
-  // デフォルト音量の制御
+  // 動画のデフォルト設定の制御
   let video = document.getElementById('image');
-  if (video.tagName === 'VIDEO') {
-    video.volume = 0.1;
+  if (video && video !== undefined) {
+    if (video.tagName === 'VIDEO') {
+      video.volume = 0.2;
+    }
   }
 });
 
