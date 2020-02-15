@@ -31,6 +31,7 @@ window.addEventListener('load', () => {
   if (video && video !== undefined) {
     if (video.tagName === 'VIDEO') {
       video.volume = 0.2;
+      video.loop = false;
     }
   }
 });
