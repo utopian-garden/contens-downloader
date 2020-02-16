@@ -137,14 +137,14 @@ exports.dlPosts = async () => {
           }
 
           // 検索結果でループ
-          for (let i = 0; i < searchRes.length; i++) {
-            const postId = searchRes[i].id;
+          for (let item of searchRes) {
+            const postId = item.id;
             if (curLast > postId) {
               break page_loop;
             }
 
             // ファイル名の整形
-            const fileUrl = searchRes[i].file_url;
+            const fileUrl = item.file_url;
             const extension = fileUrl.split('/').pop().split('?').shift()
                 .split('.').pop();
             const fileName = postId + '.' + extension;
@@ -199,7 +199,7 @@ exports.dlPosts = async () => {
             }
 
             // お気に入りリクエスト
-            const isFaved = searchRes[i].is_favorited;
+            const isFaved = item.is_favorited;
             if (!isFaved) {
               try {
                 await req.favPost(postId, authToken);

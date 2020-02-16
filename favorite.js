@@ -132,14 +132,14 @@ exports.favPosts = async () => {
           }
 
           // 検索結果でループ
-          for (let i = 0; i < searchRes.length; i++) {
-            const postId = searchRes[i].id;
+          for (let item of searchRes) {
+            const postId = item.id;
             if (curLast > postId) {
               break page_loop;
             }
 
             // お気に入りリクエスト
-            const isFaved = searchRes[i].is_favorited;
+            const isFaved = item.is_favorited;
             if (!isFaved) {
               try {
                 await req.favPost(postId, authToken);

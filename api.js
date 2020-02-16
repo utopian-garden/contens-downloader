@@ -6,6 +6,8 @@ const sanitize = require('sanitize-filename');
 const http = require('http');
 const url = require('url');
 const qs = require('querystring')
+const log4js = require('log4js');
+log4js.configure('./config/api-log-config.json');
 const ddb = require('./lib/ddb');
 const sqs = require('./lib/sqs');
 const organize = require('./lib/file-organize');
@@ -13,6 +15,7 @@ const refill = require('./lib/mq-refill')
 const appConfig = require('./config/app-config.json');
 
 const server = http.createServer(async (req, res) => {
+  const logger = log4js.getLogger('system');
   const reqUri = url.parse(req.url);
   const reqApi = reqUri.pathname;
   const reqQuery = qs.parse(reqUri.query);
@@ -94,6 +97,7 @@ const server = http.createServer(async (req, res) => {
       const addItemUri = appConfig.api.uri.addItemUri;
       const refillUri = appConfig.api.uri.refillUri;
       const organizeUri = appConfig.api.uri.organizeUri;
+      const linkGetUri = appConfig.api.uri.linkGetUri;
 
       switch (reqApi) {
         // アイテムの追加/削除処理
@@ -216,6 +220,11 @@ const server = http.createServer(async (req, res) => {
 
           break;
 
+        case linkGetUri:
+          const linkUrl = reqBody.url;
+          logger.debug(linkUrl);
+
+          break;
         // リクエストの例外処理
         default:
           const exceptMsg = appConfig.api.msg.exceptMsg;

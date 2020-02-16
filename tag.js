@@ -2,9 +2,9 @@
 
 const path = require('path');
 const log4js = require('log4js');
-log4js.configure('../config/tag-log-config.json');
-const req = require('./req');
-const appConfig = require('../config/app-config.json');
+log4js.configure('./config/tag-log-config.json');
+const req = require('./lib/req');
+const appConfig = require('./config/app-config.json');
 
 // ポストのお気に入り処理
 exports.tagPosts = async (tagKey, searchKey) => {
@@ -62,6 +62,9 @@ exports.tagPosts = async (tagKey, searchKey) => {
         const rating = item.rating;
         const source = item.source;
         const tags = item.tags;
+
+        console.log(postId);
+
         let newTags = [];
         tags.map((row) => {
           newTags.push({"name": row["name"]});

@@ -4,9 +4,12 @@
   "manifest_version": 2,
   "description": "Chrome Extension for Contents Downloader",
   "content_scripts": [{
-    "matches": ["https://*.sample.com/*"],
-    "js": ["scripts/content.js"],
+    "matches": ["https://*.example.com/*"],
+    "js": ["scripts/downloader.js"],
     "css": ["css/style.css"]
+  }, {
+    "matches": ["https://*.example.org/*"],
+    "js": ["scripts/link-getter.js"]
   }],
   "background": {
     "scripts": [

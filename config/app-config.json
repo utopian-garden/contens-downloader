@@ -28,7 +28,8 @@
       "addItemUri": "/addItem",
       "refillUri": "/refillQueue",
       "organizeUri": "/organizeFile",
-      "chkDbUri": "/checkDb"
+      "chkDbUri": "/checkDb",
+      "linkGetUri": "/getLink"
     },
     "msg": {
       "exceptMsg": "Invalid Request",
@@ -42,23 +43,28 @@
     "auth": {
       "userName": "user",
       "passWord": "pass",
-      "authUrl": "https://api.sample.com/auth/token?lang=japanese",
+      "authUrl": "https://api.example.com/auth/token?lang=japanese",
       "authPrefix": "Bearer "
     },
     "search": {
-      "searchUrl": "https://api.sample.com/posts?tags=",
+      "searchUrl": "https://api.example.com/posts?tags=",
       "searchParam": "+-rating:safe&limit=100&page="
     },
     "fav": {
-      "favUrl": "https://api.sample.com/posts/",
+      "favUrl": "https://api.example.com/posts/",
       "favParam": "/favorite?language=japanese"
     },
     "vote": {
-      "voteUrl": "https://api.sample.com/posts/",
+      "voteUrl": "https://api.example.com/posts/",
       "voteParam": "/vote?language=japanese"
     },
     "dl": {
-      "refererUrl": "https://www.sample.com/ja/post/show/"
+      "refererUrl": "https://www.example.com/ja/post/show/"
+    },
+    "tag": {
+      "tagUrl": "https://api.example.com/posts/",
+      "tagParam": "?lang=en",
+      "refererUrl": "https://www.example.com/ja/post/show/"
     }
   },
   "db": {
