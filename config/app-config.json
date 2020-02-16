@@ -29,7 +29,7 @@
       "refillUri": "/refillQueue",
       "organizeUri": "/organizeFile",
       "chkDbUri": "/checkDb",
-      "linkGetUri": "/getLink"
+      "getLinkUri": "/getLink"
     },
     "msg": {
       "exceptMsg": "Invalid Request",

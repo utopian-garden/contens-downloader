@@ -97,7 +97,7 @@ const server = http.createServer(async (req, res) => {
       const addItemUri = appConfig.api.uri.addItemUri;
       const refillUri = appConfig.api.uri.refillUri;
       const organizeUri = appConfig.api.uri.organizeUri;
-      const linkGetUri = appConfig.api.uri.linkGetUri;
+      const getLinkUri = appConfig.api.uri.getLinkUri;
 
       switch (reqApi) {
         // アイテムの追加/削除処理
@@ -220,9 +220,17 @@ const server = http.createServer(async (req, res) => {
 
           break;
 
-        case linkGetUri:
+        case getLinkUri:
           const linkUrl = reqBody.url;
           logger.debug(linkUrl);
+
+          res.writeHead(200, {
+            'Access-Control-Allow-Origin':'*',
+            'Content-Type': 'application/json;charset=utf-8'
+          });
+          res.write(JSON.stringify({
+            'accept': true
+          }));
 
           break;
         // リクエストの例外処理

@@ -1,8 +1,14 @@
+// リンクを取得してバックグラウンドへ送信
 chrome.runtime.onMessage.addListener(msg => {
-  document.querySelectorAll('[class*="fa-magnet"]').forEach(link => {
-    chrome.runtime.sendMessage({
-      type: "url",
-      value: link.parentNode.href
-    });
-  });
+  switch (msg.type) {
+    case 'open':
+      document.querySelectorAll('[class*="fa-magnet"]').forEach(link => {
+        chrome.runtime.sendMessage({
+          type: "url",
+          value: link.parentNode.href
+        });
+      });
+
+      break;
+  }
 });

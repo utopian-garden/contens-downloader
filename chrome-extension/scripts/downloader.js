@@ -59,3 +59,15 @@ const config = {
 if (elem !== undefined && elem) {
   observer.observe(elem, config);
 }
+
+// リンクを取得して開く
+chrome.runtime.onMessage.addListener(msg => {
+  switch (msg.type) {
+    case 'open':
+      document.querySelectorAll('[class*="preview"]:not([class*="favorited"])').forEach(link => {
+        window.open(link.parentNode.href);
+      });
+
+      break;
+  }
+});

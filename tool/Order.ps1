@@ -8,6 +8,15 @@ Import-Csv Order.lst | ForEach-Object {
     if (!(Test-Path $dir)) {
       New-Item $dir -ItemType Directory
     }
+
+    if (!(Test-Path $dir\ok)) {
+      New-Item $dir\ok -ItemType Directory
+    }
+
+    if (!(Test-Path $dir\ng)) {
+      New-Item $dir\ng -ItemType Directory
+    }
+
     Move-Item $_ $dir
   }
 }
