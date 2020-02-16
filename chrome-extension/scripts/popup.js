@@ -86,17 +86,17 @@ document.getElementById('check').addEventListener('click', () => {
   chkReq();
 }, false);
 
-// checkDb を実行するイベントリスナー
+// Download の refillQueue を実行するイベントリスナー
 document.getElementById('dl-refill').addEventListener('click', () => {
   queRefill('Download');
 }, false);
 
-// checkDb を実行するイベントリスナー
+// Favorite の refillQueue を実行するイベントリスナー
 document.getElementById('fav-refill').addEventListener('click', () => {
   queRefill('Favorite');
 }, false);
 
-// checkDb を実行するイベントリスナー
+// organizeFile を実行するイベントリスナー
 document.getElementById('file-organize').addEventListener('click', () => {
   fileOrganize('Download');
 }, false);
