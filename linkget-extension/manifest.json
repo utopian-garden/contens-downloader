@@ -1,0 +1,24 @@
+{
+  "name": "Link Get Extension",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "description": "Chrome Extension for Link Get",
+  "content_scripts": [{
+    "matches": ["https://*.example.org/*"],
+    "js": ["scripts/content.js"]
+  }],
+  "background": {
+    "scripts": [
+      "scripts/background.js"
+    ]
+  },
+  "permissions": [
+    "contextMenus",
+    "http://locahost:3000/"
+  ],
+  "icons": {
+    "16": "images/16.png",
+    "48": "images/48.png",
+    "128": "images/128.png"
+  }
+}

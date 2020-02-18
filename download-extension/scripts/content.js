@@ -1,14 +1,4 @@
 window.addEventListener('load', () => {
-  // お気に入り済みコンテンツのリンクの挙動を変更
-  document.querySelectorAll('[class*="favorited"]').forEach(img => {
-    const disabledLink = () => {
-      window.open(img.parentNode.linkUrl);
-    };
-    img.parentNode.linkUrl = img.parentNode.href;
-    img.parentNode.removeAttribute('href');
-    img.parentNode.addEventListener('click', disabledLink);
-  });
-
   // リンクの検索オプションを追加
   document.querySelectorAll(
     '[class="tag-type-artist"] > a, [class="tag-type-studio"] > a'
