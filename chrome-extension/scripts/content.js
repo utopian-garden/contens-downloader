@@ -26,35 +26,11 @@ window.addEventListener('load', () => {
   }
 });
 
-// DOM変化時の処理
-const observer = new MutationObserver(() => {
-  document.querySelectorAll('[class*="favorited"]').forEach(img => {
-    const disabledLink = () => {
-      window.open(img.parentNode.linkUrl);
-    };
-    img.parentNode.linkUrl = img.parentNode.href;
-    img.parentNode.removeAttribute('href');
-    img.parentNode.addEventListener('click', disabledLink);
-  });
-});
-
-// 要素の監視を開始
-const elem = document.getElementById('recommendations');
-const config = {
-  attributes: true,
-  childList: true,
-  characterData: true
-};
-
-if (elem !== undefined && elem) {
-  observer.observe(elem, config);
-}
-
 // リンクを取得して開く
 chrome.runtime.onMessage.addListener(msg => {
   switch (msg.type) {
     case 'open':
-      document.querySelectorAll('[class*="preview"]:not([class*="favorited"])').forEach(link => {
+      document.querySelectorAll('[class*="preview"]:not([class*="favorited"]):not([id*="comment-preview-"])').forEach(link => {
         window.open(link.parentNode.href);
       });
 
