@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "description": "Chrome Extension for Contents Downloader",
   "content_scripts": [{
-    "matches": ["https://*.example.com/*"],
+    "matches": ["*://*.sankakucomplex.com/*", "*://*.nyaa.si/*"],
     "js": ["scripts/content.js"],
     "css": ["css/style.css"]
   }],
@@ -13,7 +13,15 @@
       "scripts/background.js"
     ]
   },
+  "web_accessible_resources": [
+    "popup.html"
+  ],
+  "browser_action": {
+    "default_title": "Contents Downloader Extension",
+    "default_popup": "popup.html"
+  },
   "permissions": [
+    "tabs",
     "contextMenus",
     "http://locahost:3000/"
   ],
@@ -21,12 +29,5 @@
     "16": "images/16.png",
     "48": "images/48.png",
     "128": "images/128.png"
-  },
-  "web_accessible_resources": [
-    "popup.html"
-  ],
-  "browser_action": {
-    "default_title": "Contents Downloader Extension",
-    "default_popup": "popup.html"
   }
 }
