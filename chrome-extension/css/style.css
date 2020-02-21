@@ -22,3 +22,21 @@
 .favorited {
   filter: saturate(0%);
 }
+
+/* サムネイルの表示調整 */
+div.content {
+  width: 90% !important;
+  margin-left: 10px !important;
+}
+
+span.thumb {
+  height: 210px !important;
+  width: 200px !important;
+}
+
+img.preview {
+  width:auto;
+  height:auto;
+  max-width:190px;
+  max-height:190px;
+}
