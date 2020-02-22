@@ -19,6 +19,11 @@
 }
 
 /* お気に入り済みコンテンツのグレーアウト */
+img.favorited {
+  filter: saturate(0%);
+}
+
+/* 未閲覧コンテンツの */
 img.preview:not(.favorited) {
   border:2px solid #F00 !important;
 }
