@@ -19,6 +19,7 @@ exports.tagPosts = async (tagKey, searchKey) => {
   }
 
   let pageNum = 1;
+  const searchParam = appConfig.req.search.searchParam;
 
   // ページ数でループ
   page_loop:
@@ -29,7 +30,7 @@ exports.tagPosts = async (tagKey, searchKey) => {
     let searchRes;
     try {
       searchRes = await req.searchPost(encodeURI(searchKey), pageNum,
-          authToken);
+          searchParam, authToken);
     } catch(err) {
       switch (err.statusCode) {
         case 401:
@@ -67,7 +68,7 @@ exports.tagPosts = async (tagKey, searchKey) => {
 
         let newTags = [];
         tags.map((row) => {
-          if (name !== tagKey) {
+          if (row["name"] !== tagKey) {
             newTags.push({"name": row["name"]});
           }
         });
