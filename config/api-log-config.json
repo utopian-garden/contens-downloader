@@ -2,7 +2,11 @@
   "appenders" : {
     "system" : {
       "type" : "file",
-      "filename" : "./log/api.log"
+      "filename" : "./log/api.log",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%m"
+      }
     }
   },
   "categories" : {

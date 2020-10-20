@@ -2,6 +2,7 @@
   "fs": {
     "dlDir": "./download",
     "histDir": "./download/_history",
+    "igDir": "./ignored",
     "toolDir": "./tool",
     "orderBat": "Order.bat",
     "orderPs1": "Order.ps1",
@@ -38,39 +39,43 @@
   },
   "req": {
     "common": {
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.123 Safari/537.36"
+      "userAgent": "SCChannelApp/3.0 (Android; black)"
     },
     "auth": {
-      "userName": "user",
-      "passWord": "pass",
-      "authUrl": "https://api.example.com/auth/token?lang=japanese",
+      "userName": "nagisame",
+      "passWord": "majimusume",
+      "authUrl": "https://capi-v2.sankakucomplex.com/auth/token?lang=japanese",
       "authPrefix": "Bearer "
     },
     "search": {
-      "searchUrl": "https://api.example.com/posts?tags=",
-      "searchParam": "+-rating:safe&limit=100&page="
+      "searchUrl": "https://capi-v2.sankakucomplex.com/posts?tags=",
+      "searchParam1": "+-rating:safe&limit=",
+      "searchLimit": "100",
+      "igSearchLimit": "10",
+      "searchParam2": "&page="
     },
     "fav": {
-      "favUrl": "https://api.example.com/posts/",
+      "favUrl": "https://capi-v2.sankakucomplex.com/posts/",
       "favParam": "/favorite?language=japanese"
     },
     "vote": {
-      "voteUrl": "https://api.example.com/posts/",
+      "voteUrl": "https://capi-v2.sankakucomplex.com/posts/",
       "voteParam": "/vote?language=japanese"
     },
     "dl": {
-      "refererUrl": "https://www.example.com/ja/post/show/"
+      "refererUrl": "https://chan.sankakucomplex.com/ja/post/show/"
     },
     "tag": {
-      "tagUrl": "https://api.example.com/posts/",
+      "tagUrl": "https://capi-v2.sankakucomplex.com/posts/",
       "tagParam": "?lang=en",
-      "refererUrl": "https://www.example.com/ja/post/show/"
+      "refererUrl": "https://chan.sankakucomplex.com/ja/post/show/"
     }
   },
   "db": {
     "tab": {
       "dlTable": "Download",
-      "favTable": "Favorite"
+      "favTable": "Favorite",
+      "igTable": "Ignore"
     },
     "attr": {
       "tagAttr": "tag",
@@ -82,11 +87,14 @@
       "dlQueUrl": "http://localhost:9324/queue/Download",
       "priorDlQueUrl": "http://localhost:9324/queue/priorDownload",
       "favQueUrl": "http://localhost:9324/queue/Favorite",
-      "priorFavQueUrl": "http://localhost:9324/queue/priorFavorite"
+      "priorFavQueUrl": "http://localhost:9324/queue/priorFavorite",
+      "igQueUrl": "http://localhost:9324/queue/Ignore",
+      "priorIgQueUrl": "http://localhost:9324/queue/priorIgnore"
     },
     "poll": {
       "dlQuePoll": "10",
-      "favQuePoll": "10"
+      "favQuePoll": "10",
+      "igQuePoll": "10"
     },
     "msg": {
       "startMsg": "MQ refilling started: ",

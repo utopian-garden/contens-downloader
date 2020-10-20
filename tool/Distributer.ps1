@@ -1,4 +1,4 @@
-Get-ChildItem . `
+Get-ChildItem E:\Projects\Sankaku\download `
   | Where-Object { $_.PSIsContainer } `
   | ForEach-Object -Process {
     Copy-Item Order.bat $_.FullName
