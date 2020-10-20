@@ -1,7 +1,7 @@
 {
   "fs": {
     "dlDir": "./download",
-    "histDir": "./download/_history",
+    "dlHistDir": "./download/_history",
     "igDir": "./ignored",
     "igHistDir": "./ignored/_history",
     "toolDir": "./tool",
@@ -50,10 +50,8 @@
     },
     "search": {
       "searchUrl": "https://capi-v2.sankakucomplex.com/posts?tags=",
-      "searchParam1": "+-rating:safe&limit=",
-      "searchLimit": "100",
-      "igSearchLimit": "10",
-      "searchParam2": "&page="
+      "searchParam": "+-rating:safe&limit=100&page=",
+      "igSearchParam": "+order:quality+-rating:safe&limit=20&page="
     },
     "fav": {
       "favUrl": "https://capi-v2.sankakucomplex.com/posts/",

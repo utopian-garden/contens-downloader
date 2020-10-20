@@ -94,7 +94,7 @@ exports.dlPosts = async () => {
 
       let pageNum = 1;
       let newLast = 0;
-      const searchLimit = appConfig.req.search.searchLimit;
+      const searchParam = appConfig.req.search.searchParam;
 
       // ページ数でループ
       page_loop:
@@ -105,7 +105,7 @@ exports.dlPosts = async () => {
         let searchRes;
         try {
           searchRes = await req.searchPost(encodeURIComponent(tagKey), pageNum,
-              searchLimit, authToken);
+              searchParam, authToken);
         } catch(err) {
           switch (err.statusCode) {
             case 401:
@@ -155,16 +155,16 @@ exports.dlPosts = async () => {
             const extension = fileUrl.split('/').pop().split('?').shift()
                 .split('.').pop();
             const fileName = postId + '.' + extension;
-            const tagDir = path.join(appConfig.fs.dlDir, sanitize(tagKey));
-            const histTagDir = path.join(appConfig.fs.histDir, sanitize(tagKey));
-            const filePath = path.join(tagDir, fileName);
+            const dlDir = path.join(appConfig.fs.dlDir, sanitize(tagKey));
+            const dlHistDir = path.join(appConfig.fs.dlHistDir, sanitize(tagKey));
+            const filePath = path.join(dlDir, fileName);
 
             // ファイルの存在チェック
-            if (!await walk.walkExistsSync(tagDir, fileName) &&
-                !await walk.walkExistsSync(histTagDir, fileName)) {
+            if (!await walk.walkExistsSync(dlDir, fileName) &&
+                !await walk.walkExistsSync(dlHistDir, fileName)) {
 
               // ディレクトリの作成
-              fs.ensureDirSync(tagDir);
+              fs.ensureDirSync(dlDir);
 
               // テンプレートファイルの配布
               const toolDir = appConfig.fs.toolDir;
@@ -172,11 +172,11 @@ exports.dlPosts = async () => {
               const orderPs1 = appConfig.fs.orderPs1;
               const orderLst = appConfig.fs.orderLst;
               const batFrom = path.join(toolDir, orderBat);
-              const batTo = path.join(tagDir, orderBat);
+              const batTo = path.join(dlDir, orderBat);
               const ps1From = path.join(toolDir, orderPs1);
-              const ps1To = path.join(tagDir, orderPs1);
+              const ps1To = path.join(dlDir, orderPs1);
               const lstFrom = path.join(toolDir, orderLst);
-              const lstTo = path.join(tagDir, orderLst);
+              const lstTo = path.join(dlDir, orderLst);
 
               if (!fs.pathExistsSync(batTo)) {
                 fs.copySync(batFrom, batTo);

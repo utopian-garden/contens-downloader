@@ -94,7 +94,7 @@ exports.igPosts = async () => {
 
       let pageNum = 1;
       let newLast = 0;
-      const searchLimit = appConfig.req.search.igSearchLimit;
+      const searchParam = appConfig.req.search.igSearchParam;
 
       // ページ数でループ
       page_loop:
@@ -105,7 +105,7 @@ exports.igPosts = async () => {
         let searchRes;
         try {
           searchRes = await req.searchPost(encodeURIComponent(tagKey), pageNum,
-              searchLimit, authToken);
+              searchParam, authToken);
         } catch(err) {
           switch (err.statusCode) {
             case 401:
@@ -155,16 +155,16 @@ exports.igPosts = async () => {
             const extension = fileUrl.split('/').pop().split('?').shift()
                 .split('.').pop();
             const fileName = postId + '.' + extension;
-            const tagDir = path.join(appConfig.fs.igDir, sanitize(tagKey));
-            const histTagDir = path.join(appConfig.fs.histDir, sanitize(tagKey));
-            const filePath = path.join(tagDir, fileName);
+            const igDir = path.join(appConfig.fs.igDir, sanitize(tagKey));
+            const igHistDir = path.join(appConfig.fs.igHistDir, sanitize(tagKey));
+            const filePath = path.join(igDir, fileName);
 
             // ファイルの存在チェック
-            if (!await walk.walkExistsSync(tagDir, fileName) &&
-                !await walk.walkExistsSync(histTagDir, fileName)) {
+            if (!await walk.walkExistsSync(igDir, fileName) &&
+                !await walk.walkExistsSync(igHistDir, fileName)) {
 
               // ディレクトリの作成
-              fs.ensureDirSync(tagDir);
+              fs.ensureDirSync(igDir);
 
               // テンプレートファイルの配布
               const toolDir = appConfig.fs.toolDir;
@@ -172,11 +172,11 @@ exports.igPosts = async () => {
               const orderPs1 = appConfig.fs.orderPs1;
               const orderLst = appConfig.fs.orderLst;
               const batFrom = path.join(toolDir, orderBat);
-              const batTo = path.join(tagDir, orderBat);
+              const batTo = path.join(igDir, orderBat);
               const ps1From = path.join(toolDir, orderPs1);
-              const ps1To = path.join(tagDir, orderPs1);
+              const ps1To = path.join(igDir, orderPs1);
               const lstFrom = path.join(toolDir, orderLst);
-              const lstTo = path.join(tagDir, orderLst);
+              const lstTo = path.join(igDir, orderLst);
 
               if (!fs.pathExistsSync(batTo)) {
                 fs.copySync(batFrom, batTo);
