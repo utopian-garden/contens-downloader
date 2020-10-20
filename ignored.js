@@ -115,9 +115,12 @@ exports.igPosts = async () => {
                 console.log(err.message);
               }
               break;
+
             case 400:
+            case 408:
               console.log(err.message);
               break page_loop;
+
             default:
               console.log(err.message);
               continue page_loop;
@@ -201,56 +204,11 @@ exports.igPosts = async () => {
                 }
               }
             }
-
-            /* お気に入りリクエスト
-            const isFaved = item.is_favorited;
-            if (!isFaved) {
-              try {
-                await req.favPost(postId, authToken);
-              } catch(err) {
-                switch (err.statusCode) {
-                  case 401:
-                    try {
-                      authToken = await req.getToken();
-                    } catch(err) {
-                      console.log(err.message);
-                    }
-                    break;
-                  default:
-                    console.log(err.message);
-                    continue page_loop;
-                }
-              }
-            }*/
           }
         }
 
         pageNum++;
       }
-
-      /* 最新ポスト番号をDBに反映
-      if (newLast > curLast) {
-        const lastAttr = appConfig.db.attr.lastAttr;
-        const updParams = {
-          TableName: favTable,
-          Key: {
-            'tag': tagKey
-          },
-          ExpressionAttributeNames: {
-            '#l': lastAttr
-          },
-          ExpressionAttributeValues: {
-            ':newLast': newLast
-          },
-          UpdateExpression: 'SET #l = :newLast'
-        };
-
-        try {
-          await ddb.updateItem(updParams);
-        } catch(err) {
-          console.log(JSON.stringify(err));
-        }
-      }*/
     }
   }
 }

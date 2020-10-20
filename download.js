@@ -115,9 +115,12 @@ exports.dlPosts = async () => {
                 console.log(err.message);
               }
               break;
+
             case 400:
+            case 408:
               console.log(err.message);
               break page_loop;
+
             default:
               console.log(err.message);
               continue page_loop;
