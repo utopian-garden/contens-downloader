@@ -1,6 +1,7 @@
 *.db
 *.jar
 *.lnk
+*.png
 *.txt
 download/
 dynamodb_local_latest/DynamoDBLocal_lib/
