@@ -180,6 +180,16 @@ const server = http.createServer(async (req, res) => {
               const priorDlQueUrl = appConfig.mq.url.priorDlQueUrl;
               await sendMessage(priorDlQueUrl, reqTag);
 
+              // Download に登録する場合は既存の Ignored フォルダを削除
+              const igDir = path.join(appConfig.fs.igDir, sanitize(reqTag));
+              const igHistDir = path.join(appConfig.fs.igHistDir, sanitize(reqTag));
+              try {
+                fs.removeSync(igDir);
+                fs.removeSync(igHistDir);
+              } catch(err) {
+                console.log(err);
+              }
+
               break;
           }
 

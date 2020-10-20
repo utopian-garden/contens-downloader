@@ -3,6 +3,7 @@
     "dlDir": "./download",
     "histDir": "./download/_history",
     "igDir": "./ignored",
+    "igHistDir": "./ignored/_history",
     "toolDir": "./tool",
     "orderBat": "Order.bat",
     "orderPs1": "Order.ps1",
