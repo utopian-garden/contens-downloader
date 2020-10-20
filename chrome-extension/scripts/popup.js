@@ -96,6 +96,11 @@ document.getElementById('fav-refill').addEventListener('click', () => {
   queRefill('Favorite');
 }, false);
 
+// Ignore の refillQueue を実行するイベントリスナー
+document.getElementById('ig-refill').addEventListener('click', () => {
+  queRefill('Ignore');
+}, false);
+
 // organizeFile を実行するイベントリスナー
 document.getElementById('file-organize').addEventListener('click', () => {
   fileOrganize('Download');

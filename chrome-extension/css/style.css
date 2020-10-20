@@ -1,6 +1,14 @@
 /* 不要なコンテンツの非表示 */
+#popular-preview {
+  display: none;
+}
+
 #headerthumbs {
   visibility: hidden;
+}
+
+#has-mail-notice {
+  display: none;
 }
 
 /* 不快なコンテンツの非表示 */
@@ -23,9 +31,13 @@ img.favorited {
   filter: saturate(0%);
 }
 
-/* 未閲覧コンテンツの */
-img.preview:not(.favorited) {
-  border:2px solid #F00 !important;
+/* 未閲覧コンテンツのハイライト */
+img.preview:not(.favorited):not([title~="Rating:Safe"]) {
+    border:2px solid #F00 !important;
+}
+
+img.preview[title~="Rating:Safe"] {
+  filter: saturate(0%);
 }
 
 /* サムネイルの表示調整 */
