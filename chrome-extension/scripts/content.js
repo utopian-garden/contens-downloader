@@ -4,7 +4,7 @@ window.addEventListener('load', () => {
     '[class*="tag-type-"] > a'
   ).forEach(link => {
     link.setAttribute('href', link.getAttribute('href') +
-        '+order:quality+rating:explicit');
+        '+order:quality+-rating:safe');
   });
 
   // 検索ボックスのオプションを追加
@@ -15,7 +15,7 @@ window.addEventListener('load', () => {
     }
 
     if (!box.value.includes('rating')) {
-      box.value += ' rating:explicit';
+      box.value += ' -rating:safe';
     }
   }
 

@@ -90,6 +90,7 @@ exports.favPosts = async () => {
 
       let pageNum = 1;
       let newLast = 0;
+      const searchParam = appConfig.req.search.searchParam;
 
       // ページ数でループ
       page_loop:
@@ -100,7 +101,7 @@ exports.favPosts = async () => {
         let searchRes;
         try {
           searchRes = await req.searchPost(encodeURIComponent(tagKey), pageNum,
-              authToken);
+              searchParam, authToken);
         } catch(err) {
           switch (err.statusCode) {
             case 401:
