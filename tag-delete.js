@@ -7,7 +7,7 @@ const req = require('./lib/req');
 const appConfig = require('./config/app-config.json');
 
 // ポストのお気に入り処理
-exports.tagPosts = async (tagKey, searchKey) => {
+exports.tagPosts = async (tagKey, searchKey, pageFeed) => {
   const logger = log4js.getLogger('system');
 
   // 認証リクエスト
@@ -107,16 +107,18 @@ exports.tagPosts = async (tagKey, searchKey) => {
       }
     }
 
-    pageNum++;
+    if (pageFeed === "on") {
+      pageNum++;
+    }
   }
 }
 
 const tagKey = process.argv[2];
 const searchKey = process.argv[3];
+const pageFeed = process.argv[4];
 
-
-if (tagKey !== undefined && tagKey && searchKey !== undefined && searchKey) {
+if (tagKey !== undefined && tagKey && searchKey !== undefined && searchKey && pageFeed !== undefined && pageFeed) {
   exports.tagPosts(tagKey, searchKey);
 } else {
-  console.log('Usage: node ' + path.basename(process.argv[1]) + ' <tagKey> <searchKey>');
+  console.log('Usage: node ' + path.basename(process.argv[1]) + ' <tagKey> <searchKey> <feed(on/off)>');
 }
