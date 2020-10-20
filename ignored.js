@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const sanitize = require('sanitize-filename');
 const log4js = require('log4js');
-log4js.configure('./config/dl-log-config.json');
+log4js.configure('./config/ig-log-config.json');
 const req = require('./lib/req');
 const ddb = require('./lib/ddb');
 const sqs = require('./lib/sqs');
@@ -12,7 +12,7 @@ const walk = require('./lib/walk');
 const appConfig = require('./config/app-config.json');
 
 // ポストのダウンロード処理
-exports.dlPosts = async () => {
+exports.igPosts = async () => {
   const logger = log4js.getLogger('system');
 
   // 認証リクエスト
@@ -26,9 +26,9 @@ exports.dlPosts = async () => {
   // ループ処理開始
   while (true) {
     // 優先キューからメッセージを取得
-    const priorDlQueUrl = appConfig.mq.url.priorDlQueUrl;
+    const priorIgQueUrl = appConfig.mq.url.priorIgQueUrl;
     const recvParams = {
-      QueueUrl: priorDlQueUrl,
+      QueueUrl: priorIgQueUrl,
     };
 
     let tagMsg;
@@ -39,10 +39,10 @@ exports.dlPosts = async () => {
     }
 
     // 通常キューからメッセージを取得
-    const dlQueUrl = appConfig.mq.url.dlQueUrl;
+    const igQueUrl = appConfig.mq.url.igQueUrl;
     if (tagMsg === undefined) {
       const recvParams = {
-        QueueUrl: dlQueUrl,
+        QueueUrl: igQueUrl,
       };
 
       try {
@@ -53,22 +53,22 @@ exports.dlPosts = async () => {
     }
 
     // メッセージが取得できない場合は待機
-    const dlTable = appConfig.db.tab.dlTable;
-    const dlQuePoll = appConfig.mq.poll.dlQuePoll;
+    const favTable = appConfig.db.tab.favTable;
+    const igQuePoll = appConfig.mq.poll.igQuePoll;
     if (tagMsg === undefined) {
       console.log('Waiting for message...');
-      const waitMsg = (dlQuePoll) => {
+      const waitMsg = (igQuePoll) => {
         return new Promise((resolve, reject) => {
-          setTimeout(resolve, dlQuePoll * 1000);
+          setTimeout(resolve, igQuePoll * 1000);
         });
       };
-      await waitMsg(dlQuePoll);
+      await waitMsg(igQuePoll);
     } else {
       // DBの整合性チェック
       const tagAttr = appConfig.db.attr.tagAttr;
       const tagKey = tagMsg.tag;
       const checkParams = {
-        TableName: dlTable,
+        TableName: favTable,
         ExpressionAttributeNames:{'#t': tagAttr},
         ExpressionAttributeValues:{':val': tagKey},
         KeyConditionExpression: '#t = :val'
@@ -87,18 +87,18 @@ exports.dlPosts = async () => {
       }
 
       // 最終更新の取得
-      let curLast = tagMsg.last;
-      if (curLast === undefined) {
+      let curLast = 0;
+      /*if (curLast === undefined) {
         curLast = 0;
-      }
+      }*/
 
       let pageNum = 1;
       let newLast = 0;
-      const searchLimit = appConfig.req.search.searchLimit;
+      const searchLimit = appConfig.req.search.igSearchLimit;
 
       // ページ数でループ
       page_loop:
-      while (true) {
+      while (2 > pageNum) {
         console.log(tagKey, pageNum);
 
         // 検索リクエスト
@@ -152,7 +152,7 @@ exports.dlPosts = async () => {
             const extension = fileUrl.split('/').pop().split('?').shift()
                 .split('.').pop();
             const fileName = postId + '.' + extension;
-            const tagDir = path.join(appConfig.fs.dlDir, sanitize(tagKey));
+            const tagDir = path.join(appConfig.fs.igDir, sanitize(tagKey));
             const histTagDir = path.join(appConfig.fs.histDir, sanitize(tagKey));
             const filePath = path.join(tagDir, fileName);
 
@@ -202,7 +202,7 @@ exports.dlPosts = async () => {
               }
             }
 
-            // お気に入りリクエスト
+            /* お気に入りリクエスト
             const isFaved = item.is_favorited;
             if (!isFaved) {
               try {
@@ -221,18 +221,18 @@ exports.dlPosts = async () => {
                     continue page_loop;
                 }
               }
-            }
+            }*/
           }
         }
 
         pageNum++;
       }
 
-      // 最新ポスト番号をDBに反映
+      /* 最新ポスト番号をDBに反映
       if (newLast > curLast) {
         const lastAttr = appConfig.db.attr.lastAttr;
         const updParams = {
-          TableName: dlTable,
+          TableName: favTable,
           Key: {
             'tag': tagKey
           },
@@ -250,7 +250,7 @@ exports.dlPosts = async () => {
         } catch(err) {
           console.log(JSON.stringify(err));
         }
-      }
+      }*/
     }
   }
 }
@@ -258,5 +258,5 @@ exports.dlPosts = async () => {
 const concurrency = 1;
 
 for (let i = 0; i < concurrency; i++) {
-  exports.dlPosts();
+  exports.igPosts();
 }
