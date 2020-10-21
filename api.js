@@ -140,10 +140,10 @@ const server = http.createServer(async (req, res) => {
 
               // Favorite に登録する場合は既存のDLフォルダを削除
               const tagDir = path.join(appConfig.fs.dlDir, sanitize(reqTag));
-              const histTagDir = path.join(appConfig.fs.histDir, sanitize(reqTag));
+              const tagHistDir = path.join(appConfig.fs.dlHistDir, sanitize(reqTag));
               try {
                 fs.removeSync(tagDir);
-                fs.removeSync(histTagDir);
+                fs.removeSync(tagHistDir);
               } catch(err) {
                 console.log(err);
               }
