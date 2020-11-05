@@ -117,7 +117,7 @@ exports.dlConfirm = async () => {
           // 検索結果でループ
           for (let item of searchRes) {
             for (let tag of item.tags) {
-              if (tag.name_en === tagKey && tag.name_ja !== tagKey && tag.name_ja !== "null") {
+              if (tag.name_en === tagKey && tag.name_ja !== tagKey && tag.name_ja !== null) {
                 logger.debug(tag.name_en, tag.name_ja);
               }
             }
