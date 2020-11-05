@@ -189,6 +189,12 @@ exports.dlPosts = async () => {
                 fs.copySync(lstFrom, lstTo);
               }
 
+              const ngId = appConfig.ng.ngId;
+              // NG ポストのダウンロードをスキップ
+              if (postId === ngId) {
+                continue;
+              }
+
               // ダウンロード リクエスト
               const refererUrl = appConfig.req.dl.refererUrl + postId;
               try {

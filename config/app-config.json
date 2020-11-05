@@ -99,5 +99,8 @@
       "startMsg": "MQ refilling started: ",
       "finMsg": "MQ refilling finished: "
     }
+  },
+  "ng": {
+    "ngId": "816140"
   }
 }
