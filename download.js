@@ -117,8 +117,11 @@ exports.dlPosts = async () => {
               break;
 
             case 400:
-            case 408:
               console.log(err.message);
+              break page_loop;
+
+            case 408:
+              logger.debug(tagKey, err.message);
               break page_loop;
 
             default:
@@ -189,8 +192,8 @@ exports.dlPosts = async () => {
                 fs.copySync(lstFrom, lstTo);
               }
 
-              const ngId = appConfig.ng.ngId;
               // NG ポストのダウンロードをスキップ
+              const ngId = appConfig.ng.ngId;
               if (postId === ngId) {
                 continue;
               }

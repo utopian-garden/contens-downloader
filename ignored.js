@@ -117,8 +117,11 @@ exports.igPosts = async () => {
               break;
 
             case 400:
-            case 408:
               console.log(err.message);
+              break page_loop;
+
+            case 408:
+              logger.debug(tagKey, err.message);
               break page_loop;
 
             default:
