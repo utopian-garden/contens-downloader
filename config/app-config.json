@@ -51,7 +51,8 @@
     "search": {
       "searchUrl": "https://capi-v2.sankakucomplex.com/posts?tags=",
       "searchParam": "+-rating:safe&limit=100&page=",
-      "igSearchParam": "+order:quality+-rating:safe&limit=10&page="
+      "igSearchParam": "+order:quality+-rating:safe&limit=10&page=",
+      "conSearchParam": "+-rating:safe&limit=1&page="
     },
     "fav": {
       "favUrl": "https://capi-v2.sankakucomplex.com/posts/",
