@@ -8,10 +8,9 @@ log4js.configure('./config/dl-log-config.json');
 const req = require('./lib/req');
 const ddb = require('./lib/ddb');
 const sqs = require('./lib/sqs');
-const walk = require('./lib/walk');
 const appConfig = require('./config/app-config.json');
 
-// ポストのダウンロード処理
+// DL DB の修正処理
 exports.dlConfirm = async () => {
   const logger = log4js.getLogger('system');
 
@@ -90,11 +89,8 @@ exports.dlConfirm = async () => {
               break;
 
             case 400:
-              console.log(err.message);
-              break page_loop;
-
             case 408:
-              logger.debug(tagKey, err.message);
+                console.log(err.message);
               break page_loop;
 
             default:
@@ -117,8 +113,58 @@ exports.dlConfirm = async () => {
           // 検索結果でループ
           for (let item of searchRes) {
             for (let tag of item.tags) {
-              if (tag.name_en === tagKey && tag.name_ja !== tagKey && tag.name_ja !== null) {
-                logger.debug(tag.name_en, tag.name_ja);
+              if (tag.name_ja === tagKey && tag.name_en !== tagKey && tag.name_en !== null) {
+
+                // DB に追加
+                const dlTable = appConfig.db.tab.dlTable;
+                const lastAttr = appConfig.db.attr.lastAttr;
+                const updParams = {
+                  TableName: dlTable,
+                  Key: {
+                    'tag': tag.name_en
+                  },
+                  ExpressionAttributeNames: {
+                    '#l': lastAttr
+                  },
+                  ExpressionAttributeValues: {
+                    ':newLast': 0
+                  },
+                  UpdateExpression: 'SET #l = :newLast'
+                };
+
+                try {
+                  await ddb.updateItem(updParams);
+                } catch(err) {
+                  console.log(JSON.stringify(err));
+                }
+
+                // フォルダのリネーム
+                const enDlDir = path.join(appConfig.fs.dlDir, sanitize(tag.name_en));
+                const enDlHistDir = path.join(appConfig.fs.dlHistDir, sanitize(tag.name_en));
+                const jaDlDir = path.join(appConfig.fs.dlDir, sanitize(tag.name_ja));
+                const jaDlHistDir = path.join(appConfig.fs.dlHistDir, sanitize(tag.name_ja));
+
+                if (fs.pathExistsSync(jaDlDir)) {
+                  fs.moveSync(jaDlDir, enDlDir);
+                }
+
+                if (fs.pathExistsSync(jaDlHistDir)) {
+                  fs.moveSync(jaDlHistDir, enDlHistDir);
+                }
+
+                // DB から削除
+                const delParams = {
+                  TableName: dlTable,
+                  Key: {
+                    'tag': tag.name_ja
+                  }
+                };
+
+                try {
+                  await ddb.deleteItem(delParams);
+                } catch(err) {
+                  console.log(JSON.stringify(err));
+                }
               }
             }
           }

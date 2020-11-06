@@ -8,10 +8,9 @@ log4js.configure('./config/fav-log-config.json');
 const req = require('./lib/req');
 const ddb = require('./lib/ddb');
 const sqs = require('./lib/sqs');
-const walk = require('./lib/walk');
 const appConfig = require('./config/app-config.json');
 
-// ポストのダウンロード処理
+// Fav DB の修正処理
 exports.favConfirm = async () => {
   const logger = log4js.getLogger('system');
 
@@ -90,11 +89,8 @@ exports.favConfirm = async () => {
               break;
 
             case 400:
-              console.log(err.message);
-              break page_loop;
-
             case 408:
-              logger.debug(tagKey, err.message);
+                console.log(err.message);
               break page_loop;
 
             default:
@@ -117,8 +113,58 @@ exports.favConfirm = async () => {
           // 検索結果でループ
           for (let item of searchRes) {
             for (let tag of item.tags) {
-              if (tag.name_en === tagKey && tag.name_ja !== tagKey && tag.name_ja !== null) {
-                logger.debug(tag.name_en, tag.name_ja);
+              if (tag.name_ja === tagKey && tag.name_en !== tagKey && tag.name_en !== null) {
+
+                // DB に追加
+                const favTable = appConfig.db.tab.favTable;
+                const lastAttr = appConfig.db.attr.lastAttr;
+                const updParams = {
+                  TableName: favTable,
+                  Key: {
+                    'tag': tag.name_en
+                  },
+                  ExpressionAttributeNames: {
+                    '#l': lastAttr
+                  },
+                  ExpressionAttributeValues: {
+                    ':newLast': 0
+                  },
+                  UpdateExpression: 'SET #l = :newLast'
+                };
+
+                try {
+                  await ddb.updateItem(updParams);
+                } catch(err) {
+                  console.log(JSON.stringify(err));
+                }
+
+                // フォルダのリネーム
+                const enIgDir = path.join(appConfig.fs.igDir, sanitize(tag.name_en));
+                const enIgHistDir = path.join(appConfig.fs.igHistDir, sanitize(tag.name_en));
+                const jaIgDir = path.join(appConfig.fs.igDir, sanitize(tag.name_ja));
+                const jaIgHistDir = path.join(appConfig.fs.igHistDir, sanitize(tag.name_ja));
+
+                if (fs.pathExistsSync(jaIgDir)) {
+                  fs.moveSync(jaIgDir, enIgDir);
+                }
+
+                if (fs.pathExistsSync(jaIgHistDir)) {
+                  fs.moveSync(jaIgHistDir, enIgHistDir);
+                }
+
+                // DB から削除
+                const delParams = {
+                  TableName: favTable,
+                  Key: {
+                    'tag': tag.name_ja
+                  }
+                };
+
+                try {
+                  await ddb.deleteItem(delParams);
+                } catch(err) {
+                  console.log(JSON.stringify(err));
+                }
               }
             }
           }
