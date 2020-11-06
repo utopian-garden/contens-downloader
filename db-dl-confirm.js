@@ -145,11 +145,11 @@ exports.dlConfirm = async () => {
                 const jaDlHistDir = path.join(appConfig.fs.dlHistDir, sanitize(tag.name_ja));
 
                 if (fs.pathExistsSync(jaDlDir)) {
-                  fs.moveSync(jaDlDir, enDlDir);
+                  fs.moveSync(jaDlDir, enDlDir, { overwrite: true });
                 }
 
                 if (fs.pathExistsSync(jaDlHistDir)) {
-                  fs.moveSync(jaDlHistDir, enDlHistDir);
+                  fs.moveSync(jaDlHistDir, enDlHistDir, { overwrite: true });
                 }
 
                 // DB から削除

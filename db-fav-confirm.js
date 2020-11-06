@@ -145,11 +145,11 @@ exports.favConfirm = async () => {
                 const jaIgHistDir = path.join(appConfig.fs.igHistDir, sanitize(tag.name_ja));
 
                 if (fs.pathExistsSync(jaIgDir)) {
-                  fs.moveSync(jaIgDir, enIgDir);
+                  fs.moveSync(jaIgDir, enIgDir, { overwrite: true });
                 }
 
                 if (fs.pathExistsSync(jaIgHistDir)) {
-                  fs.moveSync(jaIgHistDir, enIgHistDir);
+                  fs.moveSync(jaIgHistDir, enIgHistDir, { overwrite: true });
                 }
 
                 // DB から削除
