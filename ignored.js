@@ -162,55 +162,31 @@ exports.igPosts = async () => {
             const igHistDir = path.join(appConfig.fs.igHistDir, sanitize(tagKey));
             const filePath = path.join(igDir, fileName);
 
-            // ファイルの存在チェック
-            if (!await walk.walkExistsSync(igDir, fileName) &&
-                !await walk.walkExistsSync(igHistDir, fileName)) {
+            // ファイルの存在と NG チェック
+            const ngId = appConfig.ng.ngId;
 
-              // ディレクトリの作成
-              fs.ensureDirSync(igDir);
+            if (postId === ngId ||
+                await walk.walkExistsSync(igDir, fileName) ||
+                await walk.walkExistsSync(igHistDir, fileName)) {
 
-              // テンプレートファイルの配布
-              const toolDir = appConfig.fs.toolDir;
-              const orderBat = appConfig.fs.orderBat;
-              const orderPs1 = appConfig.fs.orderPs1;
-              const orderLst = appConfig.fs.orderLst;
-              const batFrom = path.join(toolDir, orderBat);
-              const batTo = path.join(igDir, orderBat);
-              const ps1From = path.join(toolDir, orderPs1);
-              const ps1To = path.join(igDir, orderPs1);
-              const lstFrom = path.join(toolDir, orderLst);
-              const lstTo = path.join(igDir, orderLst);
+              continue;
+            }
 
-              if (!fs.pathExistsSync(batTo)) {
-                fs.copySync(batFrom, batTo);
-              }
+            // ディレクトリの作成
+            fs.ensureDirSync(igDir);
 
-              if (!fs.pathExistsSync(ps1To)) {
-                fs.copySync(ps1From, ps1To);
-              }
-              if (!fs.pathExistsSync(lstTo)) {
-                fs.copySync(lstFrom, lstTo);
-              }
-
-              // NG ポストのダウンロードをスキップ
-              const ngId = appConfig.ng.ngId;
-              if (postId === ngId) {
-                continue;
-              }
-
-              // ダウンロード リクエスト
-              const refererUrl = appConfig.req.dl.refererUrl + postId;
-              try {
-                await req.dlContent(filePath, fileUrl, refererUrl);
-                console.log(postId);
-              } catch(err) {
-                switch(err.statusCode) {
-                  case 404:
-                    break;
-                  default:
-                    console.log(err.message);
-                    continue page_loop;
-                }
+            // ダウンロード リクエスト
+            const refererUrl = appConfig.req.dl.refererUrl + postId;
+            try {
+              await req.dlContent(filePath, fileUrl, refererUrl);
+              console.log(postId);
+            } catch(err) {
+              switch(err.statusCode) {
+                case 404:
+                  break;
+                default:
+                  console.log(err.message);
+                  continue page_loop;
               }
             }
           }
