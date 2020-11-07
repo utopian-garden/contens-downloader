@@ -192,6 +192,12 @@ exports.igPosts = async () => {
                 fs.copySync(lstFrom, lstTo);
               }
 
+              // NG ポストのダウンロードをスキップ
+              const ngId = appConfig.ng.ngId;
+              if (postId === ngId) {
+                continue;
+              }
+
               // ダウンロード リクエスト
               const refererUrl = appConfig.req.dl.refererUrl + postId;
               try {
