@@ -84,6 +84,18 @@
     "attr": {
       "tagAttr": "tag",
       "lastAttr": "last"
+    },
+    "promote": {
+      "msg": {
+        "finMsg": "DB promotion finished.",
+        "startMsg": "DB promotion started."
+      }
+    },
+    "demote": {
+      "msg": {
+        "finMsg": "DB demotion finished.",
+        "startMsg": "DB demotion started."
+      }
     }
   },
   "mq": {

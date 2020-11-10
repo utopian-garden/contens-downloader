@@ -47,8 +47,6 @@ const queRefill = async (refillTab) => {
       'table': refillTab
     }),
   });
-
-  addKey.value = "";
 }
 
 // organizeFile の POST リクエスト
@@ -59,10 +57,9 @@ const fileOrganize = async () => {
       "Content-Type": "application/json",
     },
   });
-
-  addKey.value = "";
 }
 
+// promoteTag の POST リクエスト
 const tagPromote = async () => {
   fetch('http://localhost:3000/promoteTag', {
     method: "POST",
@@ -70,10 +67,9 @@ const tagPromote = async () => {
       "Content-Type": "application/json",
     },
   });
-
-  addKey.value = "";
 }
 
+// demoteTag の POST リクエスト
 const tagDemote = async () => {
   fetch('http://localhost:3000/demoteTag', {
     method: "POST",
@@ -81,8 +77,6 @@ const tagDemote = async () => {
       "Content-Type": "application/json",
     },
   });
-
-  addKey.value = "";
 }
 
 // Download の addItem を実行するイベントリスナー
