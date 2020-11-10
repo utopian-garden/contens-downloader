@@ -28,7 +28,6 @@ const chkReq = async () => {
         "Content-Type": "application/json",
       },
     });
-
   } catch(err) {
     alert(err);
   }
@@ -39,8 +38,6 @@ const chkReq = async () => {
 
 // refillQueue の POST リクエスト
 const queRefill = async (refillTab) => {
-  let addKey = document.getElementById('tag');
-
   fetch('http://localhost:3000/refillQueue', {
     method: "POST",
     headers: {
@@ -55,17 +52,34 @@ const queRefill = async (refillTab) => {
 }
 
 // organizeFile の POST リクエスト
-const fileOrganize = async (organizeTab) => {
-  let addKey = document.getElementById('tag');
-
+const fileOrganize = async () => {
   fetch('http://localhost:3000/organizeFile', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      'table': organizeTab
-    }),
+  });
+
+  addKey.value = "";
+}
+
+const tagPromote = async () => {
+  fetch('http://localhost:3000/promoteTag', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  addKey.value = "";
+}
+
+const tagDemote = async () => {
+  fetch('http://localhost:3000/demoteTag', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
   addKey.value = "";
@@ -99,6 +113,16 @@ document.getElementById('fav-refill').addEventListener('click', () => {
 // Ignore の refillQueue を実行するイベントリスナー
 document.getElementById('ig-refill').addEventListener('click', () => {
   queRefill('Ignore');
+}, false);
+
+// tagPromote を実行するイベントリスナー
+document.getElementById('tag-promote').addEventListener('click', () => {
+  tagPromote();
+}, false);
+
+// tagDemote を実行するイベントリスナー
+document.getElementById('tag-demote').addEventListener('click', () => {
+  tagDemote();
 }, false);
 
 // organizeFile を実行するイベントリスナー

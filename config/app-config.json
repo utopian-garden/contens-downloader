@@ -6,34 +6,36 @@
     "igDir": "./ignored",
     "igHistDir": "./ignored/_history",
     "igOkDir": "./ignored/_ok",
-    "toolDir": "./tool",
     "orderBat": "Order.bat",
+    "orderLst": "Order.lst",
     "orderPs1": "Order.ps1",
-    "orderLst": "Order.lst"
+    "toolDir": "./tool"
   },
   "organize": {
     "assortRule": [
-      {"fileExt": ".jpg", "fileType": "image"},
-      {"fileExt": ".png", "fileType": "image"},
       {"fileExt": ".gif", "fileType": "gif"},
-      {"fileExt": ".swf", "fileType": "swf"},
-      {"fileExt": ".webm", "fileType": "video"},
+      {"fileExt": ".jpg", "fileType": "image"},
+      {"fileExt": ".mp4", "fileType": "video"},
       {"fileExt": ".ogv", "fileType": "video"},
-      {"fileExt": ".mp4", "fileType": "video"}
+      {"fileExt": ".png", "fileType": "image"},
+      {"fileExt": ".swf", "fileType": "swf"},
+      {"fileExt": ".webm", "fileType": "video"}
     ],
     "fileThre": 500,
     "msg": {
-      "startMsg": "File organization started.",
-      "finMsg": "File organization finished."
+      "finMsg": "File organization finished.",
+      "startMsg": "File organization started."
     }
   },
   "api": {
     "uri": {
       "addItemUri": "/addItem",
-      "refillUri": "/refillQueue",
-      "organizeUri": "/organizeFile",
       "chkDbUri": "/checkDb",
-      "getLinkUri": "/getLink"
+      "demoteUri": "/demoteTag",
+      "getLinkUri": "/getLink",
+      "organizeUri": "/organizeFile",
+      "promoteUri": "/promoteTag",
+      "refillUri": "/refillQueue"
     },
     "msg": {
       "exceptMsg": "Invalid Request",
@@ -45,16 +47,16 @@
       "userAgent": "SCChannelApp/3.0 (Android; black)"
     },
     "auth": {
-      "userName": "nagisame",
-      "passWord": "majimusume",
+      "authPrefix": "Bearer ",
       "authUrl": "https://capi-v2.sankakucomplex.com/auth/token?lang=japanese",
-      "authPrefix": "Bearer "
+      "passWord": "majimusume",
+      "userName": "nagisame"
     },
     "search": {
-      "searchUrl": "https://capi-v2.sankakucomplex.com/posts?tags=",
-      "searchParam": "+-rating:safe&limit=100&page=",
+      "conSearchParam": "+-rating:safe&limit=1&page=",
       "igSearchParam": "+order:quality+-rating:safe&limit=10&page=",
-      "conSearchParam": "+-rating:safe&limit=1&page="
+      "searchParam": "+-rating:safe&limit=100&page=",
+      "searchUrl": "https://capi-v2.sankakucomplex.com/posts?tags="
     },
     "fav": {
       "favUrl": "https://capi-v2.sankakucomplex.com/posts/",
@@ -87,10 +89,10 @@
   "mq": {
     "url": {
       "dlQueUrl": "http://localhost:9324/queue/Download",
-      "priorDlQueUrl": "http://localhost:9324/queue/priorDownload",
       "favQueUrl": "http://localhost:9324/queue/Favorite",
-      "priorFavQueUrl": "http://localhost:9324/queue/priorFavorite",
       "igQueUrl": "http://localhost:9324/queue/Ignore",
+      "priorDlQueUrl": "http://localhost:9324/queue/priorDownload",
+      "priorFavQueUrl": "http://localhost:9324/queue/priorFavorite",
       "priorIgQueUrl": "http://localhost:9324/queue/priorIgnore"
     },
     "poll": {
@@ -99,8 +101,8 @@
       "igQuePoll": "10"
     },
     "msg": {
-      "startMsg": "MQ refilling started: ",
-      "finMsg": "MQ refilling finished: "
+      "finMsg": "MQ refilling finished: ",
+      "startMsg": "MQ refilling started: "
     }
   },
   "ng": {
