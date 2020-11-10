@@ -1,6 +1,6 @@
 @echo off
 
 title Favorite
-node ./favorite.js
+node ./lib/favorite.js
 
 pause

@@ -1,6 +1,6 @@
 @echo off
 
 title Download
-node ./download.js
+node ./lib/download.js
 
 pause

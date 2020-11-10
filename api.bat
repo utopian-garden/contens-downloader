@@ -1,6 +1,6 @@
 @echo off
 
 title API
-node ./api.js
+node ./lib/api.js
 
 pause

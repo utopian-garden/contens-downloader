@@ -2,8 +2,10 @@
   "fs": {
     "dlDir": "./download",
     "dlHistDir": "./download/_history",
+    "dlNgDir": "./download/_ng",
     "igDir": "./ignored",
     "igHistDir": "./ignored/_history",
+    "igOkDir": "./ignored/_ok",
     "toolDir": "./tool",
     "orderBat": "Order.bat",
     "orderPs1": "Order.ps1",
@@ -102,6 +104,6 @@
     }
   },
   "ng": {
-    "ngId": "816140"
+    "ngId": 816140
   }
 }

@@ -1,6 +1,6 @@
 @echo off
 
 title DB Fav Confirm
-node ./db-fav-confirm.js
+node ./lib/db-fav-confirm.js
 
 pause

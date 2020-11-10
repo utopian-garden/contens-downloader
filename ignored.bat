@@ -1,6 +1,6 @@
 @echo off
 
 title Ignored
-node ./ignored.js
+node ./lib/ignored.js
 
 pause

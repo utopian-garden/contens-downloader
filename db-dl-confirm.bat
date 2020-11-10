@@ -1,6 +1,6 @@
 @echo off
 
 title DB DL Confirm
-node ./db-dl-confirm.js
+node ./lib/db-dl-confirm.js
 
 pause
