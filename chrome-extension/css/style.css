@@ -11,6 +11,16 @@
   display: none;
 }
 
+/**/
+#page {
+  transform: scale(0.95, 0.95);
+  margin-top: -43px;
+}
+
+.dmm-ntgnavi {
+  display: none;
+}
+
 /* 不快なコンテンツの非表示 */
 #p816140 {
   visibility: hidden;
@@ -33,7 +43,7 @@ img.favorited {
 
 /* 未閲覧コンテンツのハイライト */
 img.preview:not(.favorited):not([title~="Rating:Safe"]) {
-    border:2px solid #F00 !important;
+  border:2px solid #F00 !important;
 }
 
 img.preview[title~="Rating:Safe"] {
