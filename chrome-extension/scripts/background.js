@@ -41,7 +41,7 @@ chrome.contextMenus.create({
   title: "Download",
   contexts: ["page"],
   type: "normal",
-  documentUrlPatterns: ["*://chan.sankakucomplex.com/*/post/show/*"],
+  documentUrlPatterns: ["*://chan.sankakucomplex.com/*post/show/*"],
   onclick: info => {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       chrome.tabs.sendMessage(tabs[0].id, {'type':'download'});
@@ -54,7 +54,7 @@ chrome.contextMenus.create({
   title: "Favorite",
   contexts: ["page"],
   type: "normal",
-  documentUrlPatterns: ["*://chan.sankakucomplex.com/*/post/show/*"],
+  documentUrlPatterns: ["*://chan.sankakucomplex.com/*post/show/*"],
   onclick: info => {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       chrome.tabs.sendMessage(tabs[0].id, {'type':'favorite'});
