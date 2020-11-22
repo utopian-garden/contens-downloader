@@ -49,7 +49,7 @@
     "auth": {
       "authPrefix": "Bearer ",
       "authUrl": "https://capi-v2.sankakucomplex.com/auth/token?lang=japanese",
-      "passWord": "majimusume",
+      "passWord": "M@jimu$ume7",
       "userName": "nagisame"
     },
     "search": {
