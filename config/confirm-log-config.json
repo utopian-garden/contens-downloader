@@ -1,0 +1,14 @@
+{
+  "appenders" : {
+    "system" : {
+      "type" : "file",
+      "filename" : "./log/confirm.log"
+    }
+  },
+  "categories" : {
+    "default" : {
+      "appenders" : ["system"],
+      "level" : "debug"
+    }
+  }
+}

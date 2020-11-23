@@ -95,17 +95,9 @@
       "tagAttr": "tag",
       "lastAttr": "last"
     },
-    "promote": {
-      "msg": {
-        "finMsg": "DB promotion finished.",
-        "startMsg": "DB promotion started."
-      }
-    },
-    "demote": {
-      "msg": {
-        "finMsg": "DB demotion finished.",
-        "startMsg": "DB demotion started."
-      }
+    "msg": {
+      "finMsg": "DB update finished: ",
+      "startMsg": "DB update started: "
     }
   },
   "mq": {
@@ -127,7 +119,8 @@
     },
     "msg": {
       "finMsg": "MQ refilling finished: ",
-      "startMsg": "MQ refilling started: "
+      "startMsg": "MQ refilling started: ",
+      "waitingMsg": "Waiting for message..."
     }
   },
   "ng": {

@@ -1,0 +1,14 @@
+{
+  "appenders" : {
+    "system" : {
+      "type" : "file",
+      "filename" : "./log/demote.log"
+    }
+  },
+  "categories" : {
+    "default" : {
+      "appenders" : ["system"],
+      "level" : "debug"
+    }
+  }
+}
