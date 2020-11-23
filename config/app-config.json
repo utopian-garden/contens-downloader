@@ -1,11 +1,15 @@
 {
   "fs": {
-    "dlDir": "./download",
-    "dlHistDir": "./download/_history",
-    "dlNgDir": "./download/_ng",
-    "igDir": "./ignored",
-    "igHistDir": "./ignored/_history",
-    "igOkDir": "./ignored/_ok",
+    "dlDir": "./_download",
+    "dlHistDir": "./_download/_history",
+    "dlNgDir": "./_download/_ng",
+    "igDir": "./_ignored",
+    "igHistDir": "./_ignored/_history",
+    "igOkDir": "./_ignored/_ok",
+    "artDir": "./_artist",
+    "artHistDir": "./_artist/_history",
+    "stuDir": "./_studio",
+    "stuHistDir": "./_studio/_history",
     "orderBat": "Order.bat",
     "orderLst": "Order.lst",
     "orderPs1": "Order.ps1",
@@ -54,9 +58,13 @@
     },
     "search": {
       "conSearchParam": "+-rating:safe&limit=1&page=",
-      "igSearchParam": "+order:quality+-rating:safe&limit=10&page=",
+      "exSearchParam": "+order:quality+-rating:safe&limit=10&page=",
       "searchParam": "+-rating:safe&limit=100&page=",
-      "searchUrl": "https://capi-v2.sankakucomplex.com/posts?tags="
+      "searchUrl": "https://capi-v2.sankakucomplex.com/posts?tags=",
+      "tagSearchUrl": "https://capi-v2.sankakucomplex.com/tags?type=",
+      "tagSearchParam": "&order=quality&limit=100&page=",
+      "artistCode": 1,
+      "studioCode": 2
     },
     "fav": {
       "favUrl": "https://capi-v2.sankakucomplex.com/posts/",
@@ -79,7 +87,9 @@
     "tab": {
       "dlTable": "Download",
       "favTable": "Favorite",
-      "igTable": "Ignore"
+      "igTable": "Ignore",
+      "artTable": "Artist",
+      "stuTable": "Studio"
     },
     "attr": {
       "tagAttr": "tag",
@@ -103,14 +113,17 @@
       "dlQueUrl": "http://localhost:9324/queue/Download",
       "favQueUrl": "http://localhost:9324/queue/Favorite",
       "igQueUrl": "http://localhost:9324/queue/Ignore",
+      "artQueUrl": "http://localhost:9324/queue/Artist",
+      "stuQueUrl": "http://localhost:9324/queue/Studio",
       "priorDlQueUrl": "http://localhost:9324/queue/priorDownload",
-      "priorFavQueUrl": "http://localhost:9324/queue/priorFavorite",
-      "priorIgQueUrl": "http://localhost:9324/queue/priorIgnore"
+      "priorFavQueUrl": "http://localhost:9324/queue/priorFavorite"
     },
     "poll": {
       "dlQuePoll": "10",
       "favQuePoll": "10",
-      "igQuePoll": "10"
+      "igQuePoll": "10",
+      "artQuePoll": "10",
+      "stuQuePoll": "10"
     },
     "msg": {
       "finMsg": "MQ refilling finished: ",

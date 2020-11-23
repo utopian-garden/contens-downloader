@@ -2,7 +2,7 @@
   "appenders" : {
     "system" : {
       "type" : "file",
-      "filename" : "./log/ignore.log"
+      "filename" : "./log/ex-download.log"
     }
   },
   "categories" : {

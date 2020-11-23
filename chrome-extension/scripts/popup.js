@@ -109,6 +109,16 @@ document.getElementById('ig-refill').addEventListener('click', () => {
   queRefill('Ignore');
 }, false);
 
+// Artist の refillQueue を実行するイベントリスナー
+document.getElementById('art-refill').addEventListener('click', () => {
+  queRefill('Artist');
+}, false);
+
+// Studio の refillQueue を実行するイベントリスナー
+document.getElementById('stu-refill').addEventListener('click', () => {
+  queRefill('Studio');
+}, false);
+
 // tagPromote を実行するイベントリスナー
 document.getElementById('tag-promote').addEventListener('click', () => {
   tagPromote();

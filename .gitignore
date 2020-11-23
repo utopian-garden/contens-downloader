@@ -3,10 +3,12 @@
 *.lnk
 *.png
 *.txt
-download/
+_artist/
+_download/
+_ignored/
+_studio/
 dynamodb_local_latest/DynamoDBLocal_lib/
 dynamodb_local_latest/third_party_licenses/
-ignored/
 log/
 memo/
 tool/dain_app alpha/
