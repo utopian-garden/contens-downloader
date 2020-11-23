@@ -1,6 +1,6 @@
 @echo off
 
-@title Import
+@title Import Artist
 node ./lib/import.js "Artist"
 
 pause
