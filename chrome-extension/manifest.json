@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "description": "Chrome Extension for Contents Downloader",
   "content_scripts": [{
-    "matches": ["*://*.sankakucomplex.com/*", "*://*.nyaa.si/*", "*://pc-play.games.dmm.co.jp/play/detarikizx/*", "*://grow-e.cybozu.com/*"],
+    "matches": ["*://*.sankakucomplex.com/*", "*://*.nyaa.si/*", "*://pc-play.games.dmm.co.jp/play/*", "*://grow-e.cybozu.com/*"],
     "js": ["scripts/content.js"],
     "css": ["css/style.css"]
   }],

@@ -17,6 +17,10 @@
   margin-top: -43px;
 }
 
+.appdetail-gh-phase02 #main-ntg {
+  margin: 0px 0 0 !important;
+}
+
 .dmm-ntgnavi {
   display: none;
 }
