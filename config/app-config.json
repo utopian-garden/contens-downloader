@@ -33,14 +33,19 @@
       "startMsg": "File organization started."
     }
   },
+  "assign": {
+    "msg": {
+      "finMsg": "Tag assigning finished.",
+      "startMsg": "Tag assigning started."
+    }
+  },
   "api": {
     "uri": {
       "addItemUri": "/addItem",
+      "assignUri": "/assignTag",
       "chkDbUri": "/checkDb",
-      "demoteUri": "/demoteTag",
       "getLinkUri": "/getLink",
       "organizeUri": "/organizeFile",
-      "promoteUri": "/promoteTag",
       "refillUri": "/refillQueue"
     },
     "msg": {

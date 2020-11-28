@@ -59,19 +59,9 @@ const fileOrganize = async () => {
   });
 }
 
-// promoteTag の POST リクエスト
-const tagPromote = async () => {
-  fetch('http://localhost:3000/promoteTag', {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-}
-
-// demoteTag の POST リクエスト
-const tagDemote = async () => {
-  fetch('http://localhost:3000/demoteTag', {
+// tagAssign の POST リクエスト
+const tagAssign = async () => {
+  fetch('http://localhost:3000/assignTag', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -119,14 +109,9 @@ document.getElementById('stu-refill').addEventListener('click', () => {
   queRefill('Studio');
 }, false);
 
-// tagPromote を実行するイベントリスナー
-document.getElementById('tag-promote').addEventListener('click', () => {
-  tagPromote();
-}, false);
-
-// tagDemote を実行するイベントリスナー
-document.getElementById('tag-demote').addEventListener('click', () => {
-  tagDemote();
+// tagAssign を実行するイベントリスナー
+document.getElementById('tag-assign').addEventListener('click', () => {
+  tagAssign();
 }, false);
 
 // organizeFile を実行するイベントリスナー
