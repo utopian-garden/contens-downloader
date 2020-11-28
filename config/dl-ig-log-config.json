@@ -2,7 +2,7 @@
   "appenders" : {
     "system" : {
       "type" : "file",
-      "filename" : "./log/artist.log"
+      "filename" : "./log/download-ignored.log"
     }
   },
   "categories" : {

@@ -1,7 +1,7 @@
 {
   "fs": {
     "dlDir": "./_download",
-    "dlHistDir": "./_download/_history",
+    "dlOkDir": "./_download/_ok",
     "dlNgDir": "./_download/_ng",
     "igDir": "./_ignored",
     "igOkDir": "./_ignored/_ok",

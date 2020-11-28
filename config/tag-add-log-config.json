@@ -2,7 +2,7 @@
   "appenders" : {
     "system" : {
       "type" : "file",
-      "filename" : "./log/studio.log"
+      "filename" : "./log/tag-add.log"
     }
   },
   "categories" : {

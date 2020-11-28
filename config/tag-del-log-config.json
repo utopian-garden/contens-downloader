@@ -2,7 +2,7 @@
   "appenders" : {
     "system" : {
       "type" : "file",
-      "filename" : "./log/tag.log"
+      "filename" : "./log/tag-delete.log"
     }
   },
   "categories" : {
