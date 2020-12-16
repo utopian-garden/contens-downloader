@@ -88,6 +88,9 @@
       "tagUrl": "https://capi-v2.sankakucomplex.com/posts/",
       "tagParam": "?lang=en",
       "refererUrl": "https://chan.sankakucomplex.com/ja/post/show/"
+    },
+    "poll": {
+      "reqPoll": 60
     }
   },
   "db": {
