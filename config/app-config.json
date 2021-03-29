@@ -61,7 +61,7 @@
       "authPrefix": "Bearer ",
       "authUrl": "https://capi-v2.sankakucomplex.com/auth/token?lang=japanese",
       "passWord": "M@jimu$ume7",
-      "userName": "nagisame"
+      "userName": "ashi_garden"
     },
     "search": {
       "conSearchParam": "+-rating:safe&limit=1&page=",
@@ -134,6 +134,6 @@
     }
   },
   "ng": {
-    "ngId": [816140, 10735603]
+    "ngId": [816140, 10735603, 10801033, 13707164]
   }
 }
